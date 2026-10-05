@@ -150,6 +150,29 @@ tailwind.config = {
   .scan-laser {
     animation: scan-laser-move 2.4s ease-in-out infinite;
   }
+  @keyframes success-backdrop-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes success-card-in {
+    0% { opacity: 0; transform: translateY(36px) scale(.82); }
+    65% { opacity: 1; transform: translateY(-6px) scale(1.04); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @keyframes success-coin-pop {
+    0% { opacity: 0; transform: translateY(22px) scale(.4) rotate(-20deg); }
+    65% { opacity: 1; transform: translateY(-8px) scale(1.15) rotate(8deg); }
+    100% { opacity: 1; transform: translateY(0) scale(1) rotate(0); }
+  }
+  @keyframes success-sparkle {
+    0% { opacity: 0; transform: translateY(12px) scale(.2) rotate(0); }
+    35% { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-42px) scale(1.2) rotate(35deg); }
+  }
+  .success-backdrop { animation: success-backdrop-in 180ms ease-out both; }
+  .success-card { animation: success-card-in 520ms cubic-bezier(.2,.85,.25,1.2) both; }
+  .success-coin { animation: success-coin-pop 620ms cubic-bezier(.2,.85,.25,1.3) 120ms both; }
+  .success-sparkle { animation: success-sparkle 900ms ease-out both; }
   @keyframes scan-laser-move {
     0%, 100% { top: 8px; opacity: .35; }
     50% { top: calc(100% - 10px); opacity: 1; }
@@ -595,6 +618,25 @@ tailwind.config = {
   </form>
 </div>
 
+<div id="depositSuccessModal" class="success-backdrop fixed inset-0 z-[100] flex items-center justify-center bg-primary/55 p-6 backdrop-blur-md" role="status" aria-live="polite" aria-label="Setoran berhasil" hidden>
+  <div class="success-card relative w-full max-w-[340px] overflow-hidden rounded-[28px] border border-white/70 bg-white p-7 text-center shadow-[0_24px_80px_rgba(0,35,70,0.32)]">
+    <span class="success-sparkle absolute left-9 top-12 material-symbols-outlined text-[24px] text-secondary">auto_awesome</span>
+    <span class="success-sparkle absolute right-10 top-8 material-symbols-outlined text-[20px] text-primary-fixed-dim" style="animation-delay:180ms">star</span>
+    <span class="success-sparkle absolute bottom-16 right-8 material-symbols-outlined text-[18px] text-tertiary-container" style="animation-delay:320ms">eco</span>
+    <div class="success-coin mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-secondary-container to-tertiary-fixed text-on-secondary-container shadow-[0_10px_24px_rgba(0,106,97,0.28)]">
+      <span class="material-symbols-outlined text-[42px]">check_circle</span>
+    </div>
+    <h2 class="mt-5 font-headline-sm text-headline-sm font-extrabold text-primary">Berhasil ditambahkan!</h2>
+    <p id="depositSuccessName" class="mt-1 truncate font-body-md text-body-md text-on-surface-variant"></p>
+    <div class="success-coin mt-5 inline-flex items-center gap-2 rounded-full bg-secondary-container px-5 py-3 text-on-secondary-container shadow-sm">
+      <span class="material-symbols-outlined">stars</span>
+      <strong id="depositSuccessPoints" class="font-headline-sm text-headline-sm"></strong>
+      <span class="font-label-md text-label-md font-bold">Green Poin</span>
+    </div>
+    <p class="mt-4 font-body-sm text-body-sm text-on-surface-variant">Membuka daftar setor...</p>
+  </div>
+</div>
+
 <section id="scannerScreen" class="scan-screen fixed inset-y-0 left-1/2 z-[60] flex w-full max-w-[480px] -translate-x-1/2 flex-col overflow-y-auto bg-surface pb-20" aria-label="Scan obat" hidden>
   <div class="camera-stage relative flex w-full flex-col justify-between overflow-hidden bg-inverse-surface">
     <video id="cameraPreview" class="absolute inset-0 h-full w-full object-cover" autoplay playsinline muted aria-label="Tampilan kamera"></video>
@@ -615,7 +657,7 @@ tailwind.config = {
 
     <div class="relative z-10 mx-auto mt-3 flex items-center rounded-full bg-inverse-surface/75 p-1 backdrop-blur-md" role="tablist" aria-label="Mode pemindaian">
       <button type="button" class="scan-mode rounded-full bg-secondary-container px-3 py-2 font-label-sm text-label-sm font-bold text-on-secondary-container" data-mode="barcode" role="tab" aria-selected="true">Barcode</button>
-      <button type="button" class="scan-mode rounded-full px-3 py-2 font-label-sm text-label-sm text-white" data-mode="package" role="tab" aria-selected="false">Foto + Demo</button>
+      <button type="button" class="scan-mode rounded-full px-3 py-2 font-label-sm text-label-sm text-white" data-mode="package" role="tab" aria-selected="false">Foto Obat</button>
       <button type="button" class="scan-mode rounded-full px-3 py-2 font-label-sm text-label-sm text-white" data-mode="manual" role="tab" aria-selected="false">Manual</button>
     </div>
 
@@ -630,14 +672,14 @@ tailwind.config = {
     <div class="relative z-10 flex flex-col items-center gap-2 px-5 pb-4 text-center">
       <p id="cameraStatus" class="font-label-sm text-label-sm text-white" role="status" aria-live="polite">Kamera akan aktif saat kamu membuka Scan.</p>
       <p id="modeHint" class="rounded-full bg-inverse-surface/80 px-3.5 py-1 font-label-sm text-label-sm text-secondary-fixed">Arahkan barcode obat ke dalam bingkai</p>
-      <button id="choosePhoto" type="button" class="flex items-center gap-1 rounded-full bg-white/15 px-3 py-1.5 font-label-sm text-white backdrop-blur-md">
-        <span class="material-symbols-outlined text-[17px]">photo_camera</span>
-        <span>Ambil / pilih foto</span>
+      <div id="photoActions" class="flex items-center justify-center gap-3">
+      <button id="choosePhoto" type="button" aria-label="Upload foto dari galeri" class="flex h-12 w-12 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-md ring-1 ring-white/35" title="Upload foto dari galeri">
+        <span class="material-symbols-outlined text-[22px]">upload</span>
       </button>
-      <button id="captureOcrPhoto" type="button" class="hidden items-center gap-1 rounded-full bg-secondary-container px-4 py-2 font-label-md text-label-md font-bold text-on-secondary-container shadow-lg" disabled>
-        <span class="material-symbols-outlined text-[19px]">photo_camera</span>
-        <span>Ambil foto (demo)</span>
+      <button id="captureOcrPhoto" type="button" aria-label="Ambil foto dengan kamera" class="hidden h-14 w-14 items-center justify-center rounded-full border-4 border-white bg-secondary-container text-on-secondary-container shadow-lg ring-2 ring-secondary-container/60" title="Ambil foto dengan kamera" disabled>
+        <span class="material-symbols-outlined text-[25px]">photo_camera</span>
       </button>
+      </div>
       <input id="photoInput" class="hidden" type="file" accept="image/*">
     </div>
   </div>
@@ -726,12 +768,12 @@ tailwind.config = {
         <span class="material-symbols-outlined text-[20px] text-secondary">verified</span>
         <div class="min-w-0 flex-1">
           <span class="block font-label-md text-label-md font-bold text-primary">Periksa data obat</span>
-          <span class="block font-body-sm text-body-sm text-on-surface-variant">Mode demo: detail contoh Panadol, bukan hasil pembacaan obat yang sebenarnya.</span>
+          <span class="block font-body-sm text-body-sm text-on-surface-variant">Mode contoh: detail Panadol ini bukan hasil pembacaan obat yang sebenarnya.</span>
         </div>
       </div>
       <button id="manualPhotoButton" type="button" class="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border border-dashed border-secondary bg-secondary-container/30 px-3 py-2 font-label-md text-label-md font-semibold text-primary">
         <span class="material-symbols-outlined text-[20px]">add_a_photo</span>
-        <span>Ambil foto untuk isi contoh Panadol (demo)</span>
+        <span>Foto contoh Panadol atau upload gambar</span>
       </button>
       <label class="flex flex-col gap-1 font-label-sm text-label-sm font-semibold text-on-surface-variant">
         Nama obat
@@ -780,7 +822,7 @@ tailwind.config = {
         </label>
       </div>
       <details class="rounded-xl bg-surface-container-low p-3">
-        <summary class="cursor-pointer font-label-sm text-label-sm font-semibold text-primary">Lihat keterangan data demo</summary>
+        <summary class="cursor-pointer font-label-sm text-label-sm font-semibold text-primary">Lihat keterangan data contoh</summary>
         <pre id="ocrText" class="mt-2 max-h-32 overflow-auto whitespace-pre-wrap break-words font-body-sm text-body-sm text-on-surface-variant"></pre>
       </details>
       <label class="flex flex-col gap-1 font-label-sm text-label-sm font-semibold text-on-surface-variant">
@@ -794,7 +836,7 @@ tailwind.config = {
       </label>
       <div class="flex items-start gap-2 rounded-xl bg-secondary-container/35 p-3">
         <span class="material-symbols-outlined text-[18px] text-secondary">recycling</span>
-        <p class="font-body-sm text-body-sm text-on-surface-variant">Mode demo selalu menggunakan contoh Panadol dengan jumlah pil dan tanggal kedaluwarsa dummy. Jangan anggap data ini hasil pembacaan obat atau label sebenarnya.</p>
+        <p class="font-body-sm text-body-sm text-on-surface-variant">Mode contoh menggunakan Panadol dengan jumlah pil dan tanggal kedaluwarsa dummy. Jangan anggap data ini hasil pembacaan label sebenarnya.</p>
       </div>
       <p id="formStatus" class="font-label-sm text-label-sm text-error" role="alert" hidden></p>
       <button type="submit" class="flex h-[52px] w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-primary-container font-label-lg text-label-lg font-bold text-white shadow-[0_8px_20px_rgba(15,76,129,0.25)]">
@@ -850,6 +892,7 @@ tailwind.config = {
     const resultStatus = document.getElementById('resultStatus');
     const photoInput = document.getElementById('photoInput');
     const captureOcrPhoto = document.getElementById('captureOcrPhoto');
+    const photoActions = document.getElementById('photoActions');
     const videoConstraints = {
       audio: false,
       video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }
@@ -861,6 +904,8 @@ tailwind.config = {
     let scanMode = 'barcode';
     let torchEnabled = false;
     let photoUrl = null;
+    let photoDataUrl = '';
+    let successRedirectTimer = null;
     let isScanningFrame = false;
     let cameraGeneration = 0;
     let permissionTimer = null;
@@ -890,7 +935,7 @@ tailwind.config = {
       barcode: document.getElementById('medicineBarcode').value.trim(),
       ingredientInferred: Boolean(recognizedMedicine?.ingredientInferred),
       manufacturerInferred: Boolean(recognizedMedicine?.manufacturerInferred),
-      isDemo: Boolean(recognizedMedicine?.isDemo),
+      isSample: Boolean(recognizedMedicine?.isSample),
       category: recognizedMedicine?.category || 'Obat terdeteksi dari kemasan'
     });
 
@@ -900,10 +945,10 @@ tailwind.config = {
       const hasMedicineName = Boolean(medicine.name);
       const productLabel = [medicine.name, medicine.strength].filter(Boolean).join(' ');
       document.getElementById('recognitionState').textContent = hasMedicineName
-        ? `${medicine.isDemo ? 'DEMO · ' : 'Obat terdeteksi: '}${medicine.name}`
+        ? `${medicine.isSample ? 'CONTOH · ' : 'Obat terdeteksi: '}${medicine.name}`
         : 'Kemasan terdeteksi — cek nama obat';
       document.getElementById('recognitionConfidence').textContent = confidence === null
-        ? medicine.isDemo ? 'DATA DUMMY' : 'Periksa kemasan'
+        ? medicine.isSample ? 'DATA CONTOH' : 'Periksa kemasan'
         : `Teks ${Math.round(confidence)}%`;
       document.getElementById('medicineCategory').textContent = medicine.category;
       document.getElementById('recognizedName').textContent = productLabel || 'Nama obat belum terbaca';
@@ -919,8 +964,8 @@ tailwind.config = {
       document.getElementById('recognizedContents').textContent = [medicine.formType, medicine.quantity].filter(Boolean).join(' · ') || 'Belum terbaca — cek kemasan';
       document.getElementById('recognizedThumbnail').src = photoUrl || '';
       document.getElementById('recognizedThumbnail').classList.toggle('hidden', !photoUrl);
-      document.getElementById('recognitionDisclaimer').textContent = medicine.isDemo
-        ? 'Mode demo: hasil selalu ditampilkan sebagai Panadol 500 mg dengan data contoh. Nama obat, jumlah pil, dan tanggal kedaluwarsa ini bukan hasil verifikasi dari kemasan.'
+      document.getElementById('recognitionDisclaimer').textContent = medicine.isSample
+        ? 'Mode contoh: hasil selalu ditampilkan sebagai Panadol 500 mg dengan data dummy. Nama obat, jumlah pil, dan tanggal kedaluwarsa ini bukan hasil verifikasi dari kemasan.'
         : medicine.expiry
         ? 'Hasil pengenalan gambar bisa keliru. Pastikan nama, ED, isi kemasan, dan kondisi sesuai obat yang akan disetor.'
         : 'Foto sisi ini belum menampilkan tanggal kedaluwarsa. Unggah foto sisi blister/kotak yang mencantumkan EXP atau ED untuk membacanya.';
@@ -936,8 +981,8 @@ tailwind.config = {
       resultStatus.hidden = true;
     };
 
-    const applyDemoPanadol = (barcode = '', manualEntry = false) => {
-      const demoMedicine = {
+    const applySamplePanadol = (barcode = '', manualEntry = false) => {
+      const sampleMedicine = {
         name: 'Panadol',
         strength: '500 mg',
         formType: 'Tablet',
@@ -950,32 +995,60 @@ tailwind.config = {
         condition: 'Aman Disimpan',
         barcode,
         category: 'Analgesik & Antipiretik',
-        isDemo: true
+        isSample: true
       };
-      document.getElementById('medicineName').value = demoMedicine.name;
-      document.getElementById('medicineStrength').value = demoMedicine.strength;
-      document.getElementById('medicineFormType').value = demoMedicine.formType;
-      document.getElementById('medicineIngredient').value = demoMedicine.ingredient;
-      document.getElementById('medicineManufacturer').value = demoMedicine.manufacturer;
-      document.getElementById('medicineExpiry').value = demoMedicine.expiry;
-      document.getElementById('medicineQuantity').value = demoMedicine.quantity;
-      document.getElementById('medicineDepositCount').value = demoMedicine.depositCount;
-      document.getElementById('medicineBatch').value = demoMedicine.batch;
-      document.getElementById('medicineCondition').value = demoMedicine.condition;
+      document.getElementById('medicineName').value = sampleMedicine.name;
+      document.getElementById('medicineStrength').value = sampleMedicine.strength;
+      document.getElementById('medicineFormType').value = sampleMedicine.formType;
+      document.getElementById('medicineIngredient').value = sampleMedicine.ingredient;
+      document.getElementById('medicineManufacturer').value = sampleMedicine.manufacturer;
+      document.getElementById('medicineExpiry').value = sampleMedicine.expiry;
+      document.getElementById('medicineQuantity').value = sampleMedicine.quantity;
+      document.getElementById('medicineDepositCount').value = sampleMedicine.depositCount;
+      document.getElementById('medicineBatch').value = sampleMedicine.batch;
+      document.getElementById('medicineCondition').value = sampleMedicine.condition;
       document.getElementById('medicineBarcode').value = barcode;
-      recognizedMedicine = demoMedicine;
+      recognizedMedicine = sampleMedicine;
       lastOcrConfidence = null;
-      document.getElementById('ocrText').textContent = 'Mode demo: data contoh Panadol, bukan hasil pembacaan label.';
+      document.getElementById('ocrText').textContent = 'Mode contoh: data Panadol dummy, bukan hasil pembacaan label.';
       document.getElementById('addRecognizedMedicine').disabled = false;
       document.getElementById('addRecognizedMedicine').querySelector('span:last-child').textContent = 'Tambahkan ke Setoran (+20 Poin)';
       document.getElementById('addRecognizedMedicine').querySelector('.material-symbols-outlined').textContent = 'add_circle';
       document.getElementById('editRecognizedMedicine').querySelector('span:last-child').textContent = 'Edit Data Manual';
       medicineForm.hidden = true;
       renderRecognitionResult(null);
-      scanNoticeText.textContent = 'Mode demo aktif. Contoh data Panadol ditampilkan; detail tidak berasal dari hasil scan.';
+      scanNoticeText.textContent = 'Mode contoh aktif. Data Panadol dummy siap ditambahkan ke daftar setor.';
       if (manualEntry) {
         recognitionResult.hidden = true;
-        revealForm('Mode demo: contoh data Panadol sudah diisikan. Kamu bisa mengubah atau menyimpan data ini.');
+        revealForm('Mode contoh: data Panadol sudah diisikan. Kamu bisa mengubah atau menyimpan data ini.');
+      }
+    };
+
+    const readBlobAsDataUrl = (blob) => new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => typeof reader.result === 'string'
+        ? resolve(reader.result)
+        : reject(new Error('Foto tidak dapat disiapkan untuk disimpan.'));
+      reader.onerror = () => reject(reader.error || new Error('Foto tidak dapat dibaca.'));
+      reader.readAsDataURL(blob);
+    });
+
+    const createPhotoThumbnail = async (file) => {
+      let bitmap;
+      try {
+        bitmap = await createImageBitmap(file);
+        const scale = Math.min(1, 480 / Math.max(bitmap.width, bitmap.height));
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+        canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+        const context = canvas.getContext('2d');
+        if (!context) throw new Error('Browser tidak dapat memproses foto.');
+        context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+        const thumbnail = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.76));
+        if (!thumbnail) throw new Error('Foto tidak dapat dikompres untuk disimpan.');
+        return await readBlobAsDataUrl(thumbnail);
+      } finally {
+        bitmap?.close();
       }
     };
 
@@ -998,9 +1071,20 @@ tailwind.config = {
     const addDepositCard = (deposit) => {
       const card = document.createElement('article');
       card.className = 'flex items-center gap-3 rounded-2xl bg-surface-container-lowest p-3 shadow-sm';
-      const icon = document.createElement('span');
-      icon.className = 'material-symbols-outlined flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-secondary-container/50 text-secondary';
-      icon.textContent = 'medication';
+      const image = document.createElement('div');
+      image.className = 'flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-surface-container text-secondary';
+      if (deposit.imageDataUrl) {
+        const thumbnail = document.createElement('img');
+        thumbnail.className = 'h-full w-full object-cover';
+        thumbnail.src = deposit.imageDataUrl;
+        thumbnail.alt = `Foto ${deposit.name}`;
+        image.append(thumbnail);
+      } else {
+        const icon = document.createElement('span');
+        icon.className = 'material-symbols-outlined text-[24px]';
+        icon.textContent = 'medication';
+        image.append(icon);
+      }
       const details = document.createElement('div');
       details.className = 'min-w-0 flex-1';
       const name = document.createElement('span');
@@ -1018,8 +1102,8 @@ tailwind.config = {
       details.append(name, meta, extra, expiry);
       const status = document.createElement('span');
       status.className = 'rounded-full bg-secondary-container/50 px-2 py-1 font-label-sm text-label-sm font-bold text-on-secondary-container';
-      status.textContent = deposit.isDemo ? 'DEMO' : 'Baru';
-      card.append(icon, details, status);
+      status.textContent = deposit.isSample ? 'CONTOH' : 'Baru';
+      card.append(image, details, status);
       document.getElementById('scanDepositList').prepend(card);
     };
 
@@ -1037,10 +1121,18 @@ tailwind.config = {
       content.className = 'flex items-start gap-3 p-4';
       const image = document.createElement('div');
       image.className = 'flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-surface-container text-secondary';
-      const icon = document.createElement('span');
-      icon.className = 'material-symbols-outlined text-[30px]';
-      icon.textContent = /sirup|suspensi|cair/i.test(deposit.formType || '') ? 'science' : 'medication';
-      image.append(icon);
+      if (deposit.imageDataUrl) {
+        const thumbnail = document.createElement('img');
+        thumbnail.className = 'h-full w-full object-cover';
+        thumbnail.src = deposit.imageDataUrl;
+        thumbnail.alt = `Foto ${deposit.name}`;
+        image.append(thumbnail);
+      } else {
+        const icon = document.createElement('span');
+        icon.className = 'material-symbols-outlined text-[30px]';
+        icon.textContent = /sirup|suspensi|cair/i.test(deposit.formType || '') ? 'science' : 'medication';
+        image.append(icon);
+      }
       const detail = document.createElement('div');
       detail.className = 'min-w-0 flex-1';
       const titleRow = document.createElement('div');
@@ -1049,8 +1141,8 @@ tailwind.config = {
       name.className = 'truncate font-headline-sm text-headline-sm font-bold text-primary';
       name.textContent = [deposit.name, deposit.strength].filter(Boolean).join(' ');
       const badge = document.createElement('span');
-      badge.className = `shrink-0 rounded-full px-2 py-1 font-label-sm text-label-sm font-bold ${deposit.isDemo ? 'bg-primary-fixed text-on-primary-fixed-variant' : getDepositConditionClasses(deposit.condition)}`;
-      badge.textContent = deposit.isDemo ? 'DEMO' : deposit.condition || 'Aman Disimpan';
+      badge.className = `shrink-0 rounded-full px-2 py-1 font-label-sm text-label-sm font-bold ${deposit.isSample ? 'bg-primary-fixed text-on-primary-fixed-variant' : getDepositConditionClasses(deposit.condition)}`;
+      badge.textContent = deposit.isSample ? 'CONTOH' : deposit.condition || 'Aman Disimpan';
       titleRow.append(name, badge);
       const quantity = document.createElement('p');
       quantity.className = 'mt-0.5 truncate font-body-sm text-body-sm text-on-surface-variant';
@@ -1174,8 +1266,8 @@ tailwind.config = {
         const value = codes.find((code) => code.rawValue)?.rawValue;
         if (value) {
           stopDetection();
-          applyDemoPanadol(value);
-          setCameraStatus('Barcode terbaca. Mode demo mengisi contoh data Panadol untuk diperiksa.');
+          applySamplePanadol(value);
+          setCameraStatus('Barcode terbaca. Data contoh Panadol siap diperiksa.');
           return;
         }
       } catch (error) {
@@ -1245,7 +1337,7 @@ tailwind.config = {
             setCameraStatus('Kamera aktif, tetapi browser belum mendukung pembaca barcode. Gunakan foto atau mode Manual.');
           }
         } else {
-          setCameraStatus('Kamera aktif. Ambil foto kemasan sebagai referensi.');
+          setCameraStatus('Kamera aktif. Ambil foto kemasan atau upload dari galeri.');
         }
       } catch (error) {
         if (permissionTimer !== null) {
@@ -1281,6 +1373,7 @@ tailwind.config = {
       stopDetection();
       capturedPreview.classList.add('hidden');
       cameraPreview.classList.remove('hidden');
+      photoActions.hidden = mode === 'manual';
       captureOcrPhoto.classList.toggle('hidden', mode !== 'package');
       captureOcrPhoto.classList.toggle('flex', mode === 'package');
       captureOcrPhoto.disabled = true;
@@ -1288,6 +1381,7 @@ tailwind.config = {
         URL.revokeObjectURL(photoUrl);
         photoUrl = null;
       }
+      photoDataUrl = '';
       if (mode === 'manual') {
         stopCamera();
         recognizedMedicine = null;
@@ -1297,7 +1391,6 @@ tailwind.config = {
         cameraPreview.classList.add('hidden');
         recognitionResult.hidden = true;
         document.getElementById('viewfinder').classList.add('hidden');
-        document.getElementById('choosePhoto').classList.add('hidden');
         setCameraStatus('Mode input manual aktif.');
         modeHint.textContent = 'Isi data obat dari label kemasan';
         scanNoticeText.textContent = 'Isi data obat sesuai label kemasan. Pastikan nama dan tanggal kedaluwarsa benar.';
@@ -1305,7 +1398,6 @@ tailwind.config = {
         return;
       }
       document.getElementById('viewfinder').classList.remove('hidden');
-      document.getElementById('choosePhoto').classList.remove('hidden');
       recognitionResult.hidden = true;
       medicineForm.hidden = true;
       if (mode === 'barcode') {
@@ -1316,9 +1408,9 @@ tailwind.config = {
           scanVideoFrame();
         }
       } else {
-        modeHint.textContent = 'Pindai atau foto kemasan untuk melihat hasil demo';
-        scanNoticeText.textContent = 'Mode demo tidak membaca obat asli. Scan/foto menampilkan contoh Panadol dengan detail dummy.';
-        setCameraStatus('Membuka kamera untuk memindai tulisan pada kemasan...');
+        modeHint.textContent = 'Ambil foto kemasan atau upload dari galeri';
+        scanNoticeText.textContent = 'Foto akan menampilkan contoh Panadol dengan data dummy untuk dicoba.';
+        setCameraStatus('Membuka kamera...');
         capturedPreview.classList.add('hidden');
         medicineForm.hidden = true;
         await startCamera();
@@ -1355,6 +1447,7 @@ tailwind.config = {
         URL.revokeObjectURL(photoUrl);
         photoUrl = null;
       }
+      photoDataUrl = '';
       scannerScreen.hidden = true;
       homeScreen.hidden = activePage !== 'home';
       depositScreen.hidden = activePage !== 'deposit';
@@ -1400,6 +1493,22 @@ tailwind.config = {
     const closeDepositEditor = () => {
       document.getElementById('depositEditModal').hidden = true;
       document.body.style.overflow = '';
+    };
+    const showDepositSuccess = (deposit) => {
+      if (successRedirectTimer !== null) window.clearTimeout(successRedirectTimer);
+      closeScanner();
+      setActivePage('deposit');
+      renderSavedDeposits();
+      document.getElementById('depositSuccessName').textContent = `${deposit.name} berhasil masuk ke daftar setor`;
+      document.getElementById('depositSuccessPoints').textContent = `+${deposit.depositCount * 20}`;
+      const modal = document.getElementById('depositSuccessModal');
+      modal.hidden = false;
+      document.body.style.overflow = 'hidden';
+      successRedirectTimer = window.setTimeout(() => {
+        modal.hidden = true;
+        document.body.style.overflow = '';
+        successRedirectTimer = null;
+      }, 2100);
     };
     const openDepositEditor = (deposit) => {
       document.getElementById('depositEditTitle').textContent = `Edit ${deposit.name}`;
@@ -1555,6 +1664,12 @@ tailwind.config = {
         return;
       }
       if (scanMode === 'barcode') await setMode('package');
+      try {
+        photoDataUrl = await createPhotoThumbnail(file);
+      } catch (error) {
+        setCameraStatus(`Foto tidak bisa disiapkan: ${error.message}`);
+        return;
+      }
       if (photoUrl) {
         URL.revokeObjectURL(photoUrl);
       }
@@ -1579,8 +1694,8 @@ tailwind.config = {
       recognitionResult.hidden = true;
       resultStatus.hidden = true;
       setFormMessage('');
-      applyDemoPanadol('', scanMode === 'manual');
-      setCameraStatus('Mode demo aktif: data contoh Panadol sudah siap ditambahkan ke Setoran.');
+      applySamplePanadol('', scanMode === 'manual');
+      setCameraStatus('Foto siap. Data contoh Panadol bisa langsung ditambahkan ke Setor.');
     };
 
     photoInput.addEventListener('change', async () => {
@@ -1611,7 +1726,7 @@ tailwind.config = {
       }
     });
 
-    medicineForm.addEventListener('submit', (event) => {
+    medicineForm.addEventListener('submit', async (event) => {
       event.preventDefault();
       if (!medicineForm.reportValidity()) {
         return;
@@ -1629,7 +1744,8 @@ tailwind.config = {
         depositCount: Number(document.getElementById('medicineDepositCount').value),
         batch: document.getElementById('medicineBatch').value.trim(),
         condition: document.getElementById('medicineCondition').value,
-        isDemo: Boolean(recognizedMedicine?.isDemo),
+        isSample: Boolean(recognizedMedicine?.isSample),
+        imageDataUrl: photoDataUrl,
         createdAt: new Date().toISOString()
       };
       if (!deposit.name || !deposit.expiry || !Number.isInteger(deposit.depositCount) || deposit.depositCount < 1) {
@@ -1656,6 +1772,7 @@ tailwind.config = {
         scanNoticeText.textContent = `${deposit.name} berhasil ditambahkan ke daftar setoran. Kamu bisa memindai obat lain.`;
         scanNotice.classList.add('bg-secondary-container/40');
         setCameraStatus('Obat berhasil ditambahkan ke setoran.');
+        showDepositSuccess(deposit);
         if (scanMode === 'barcode' && cameraStream && barcodeDetector) {
           scanVideoFrame();
         }
@@ -1665,6 +1782,16 @@ tailwind.config = {
     });
 
     document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !document.getElementById('depositSuccessModal').hidden) {
+        const modal = document.getElementById('depositSuccessModal');
+        modal.hidden = true;
+        document.body.style.overflow = '';
+        if (successRedirectTimer !== null) {
+          window.clearTimeout(successRedirectTimer);
+          successRedirectTimer = null;
+        }
+        return;
+      }
       if (event.key === 'Escape' && !document.getElementById('depositEditModal').hidden) {
         closeDepositEditor();
         return;
