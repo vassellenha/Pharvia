@@ -526,7 +526,7 @@ tailwind.config = {
 
     <div class="relative z-10 mx-auto mt-3 flex items-center rounded-full bg-inverse-surface/75 p-1 backdrop-blur-md" role="tablist" aria-label="Mode pemindaian">
       <button type="button" class="scan-mode rounded-full bg-secondary-container px-3 py-2 font-label-sm text-label-sm font-bold text-on-secondary-container" data-mode="barcode" role="tab" aria-selected="true">Barcode</button>
-      <button type="button" class="scan-mode rounded-full px-3 py-2 font-label-sm text-label-sm text-white" data-mode="package" role="tab" aria-selected="false">Kemasan AI</button>
+      <button type="button" class="scan-mode rounded-full px-3 py-2 font-label-sm text-label-sm text-white" data-mode="package" role="tab" aria-selected="false">Foto + OCR</button>
       <button type="button" class="scan-mode rounded-full px-3 py-2 font-label-sm text-label-sm text-white" data-mode="manual" role="tab" aria-selected="false">Manual</button>
     </div>
 
@@ -545,7 +545,7 @@ tailwind.config = {
         <span class="material-symbols-outlined text-[17px]">photo_camera</span>
         <span>Ambil / pilih foto</span>
       </button>
-      <input id="photoInput" class="hidden" type="file" accept="image/*" capture="environment">
+      <input id="photoInput" class="hidden" type="file" accept="image/*">
     </div>
   </div>
 
@@ -561,7 +561,7 @@ tailwind.config = {
         <span class="material-symbols-outlined text-[20px] text-secondary">verified</span>
         <div class="min-w-0 flex-1">
           <span class="block font-label-md text-label-md font-bold text-primary">Periksa data obat</span>
-          <span class="block font-body-sm text-body-sm text-on-surface-variant">Pastikan informasi sesuai kemasan.</span>
+          <span class="block font-body-sm text-body-sm text-on-surface-variant">Hasil baca foto adalah perkiraan. Cocokkan kembali dengan kemasan.</span>
         </div>
       </div>
       <label class="flex flex-col gap-1 font-label-sm text-label-sm font-semibold text-on-surface-variant">
@@ -574,14 +574,46 @@ tailwind.config = {
       </label>
       <div class="grid grid-cols-2 gap-3">
         <label class="flex min-w-0 flex-col gap-1 font-label-sm text-label-sm font-semibold text-on-surface-variant">
-          Kedaluwarsa
+          Dosis / kekuatan
+          <input id="medicineStrength" name="strength" maxlength="80" autocomplete="off" placeholder="Contoh: 500 mg" class="h-11 min-w-0 rounded-xl border border-outline-variant/60 bg-white px-3 font-body-sm text-on-surface outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20">
+        </label>
+        <label class="flex min-w-0 flex-col gap-1 font-label-sm text-label-sm font-semibold text-on-surface-variant">
+          Bentuk obat
+          <input id="medicineFormType" name="formType" maxlength="80" autocomplete="off" placeholder="Tablet, sirup..." class="h-11 min-w-0 rounded-xl border border-outline-variant/60 bg-white px-3 font-body-sm text-on-surface outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20">
+        </label>
+      </div>
+      <label class="flex flex-col gap-1 font-label-sm text-label-sm font-semibold text-on-surface-variant">
+        Kandungan aktif <span class="font-normal">(opsional)</span>
+        <input id="medicineIngredient" name="ingredient" maxlength="160" autocomplete="off" placeholder="Bahan aktif yang tertulis pada kemasan" class="h-11 rounded-xl border border-outline-variant/60 bg-white px-3 font-body-md text-body-md text-on-surface outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20">
+      </label>
+      <label class="flex flex-col gap-1 font-label-sm text-label-sm font-semibold text-on-surface-variant">
+        Produsen <span class="font-normal">(opsional)</span>
+        <input id="medicineManufacturer" name="manufacturer" maxlength="120" autocomplete="organization" placeholder="Nama produsen pada kemasan" class="h-11 rounded-xl border border-outline-variant/60 bg-white px-3 font-body-md text-body-md text-on-surface outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20">
+      </label>
+      <div class="grid grid-cols-2 gap-3">
+        <label class="flex min-w-0 flex-col gap-1 font-label-sm text-label-sm font-semibold text-on-surface-variant">
+          Kedaluwarsa <span class="font-normal">(wajib diverifikasi)</span>
           <input id="medicineExpiry" name="expiry" type="date" required class="h-11 min-w-0 rounded-xl border border-outline-variant/60 bg-white px-2 font-body-sm text-on-surface outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20">
         </label>
         <label class="flex min-w-0 flex-col gap-1 font-label-sm text-label-sm font-semibold text-on-surface-variant">
-          Jumlah kemasan
-          <input id="medicineQuantity" name="quantity" type="number" min="1" max="999" value="1" required class="h-11 min-w-0 rounded-xl border border-outline-variant/60 bg-white px-3 font-body-md text-body-md text-on-surface outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20">
+          Isi per kemasan
+          <input id="medicineQuantity" name="quantity" maxlength="80" autocomplete="off" placeholder="Contoh: 10 tablet" class="h-11 min-w-0 rounded-xl border border-outline-variant/60 bg-white px-3 font-body-sm text-on-surface outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20">
         </label>
       </div>
+      <div class="grid grid-cols-2 gap-3">
+        <label class="flex min-w-0 flex-col gap-1 font-label-sm text-label-sm font-semibold text-on-surface-variant">
+          Kemasan disetor
+          <input id="medicineDepositCount" name="depositCount" type="number" min="1" max="999" value="1" required class="h-11 min-w-0 rounded-xl border border-outline-variant/60 bg-white px-3 font-body-md text-on-surface outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20">
+        </label>
+        <label class="flex min-w-0 flex-col gap-1 font-label-sm text-label-sm font-semibold text-on-surface-variant">
+          Batch / lot <span class="font-normal">(opsional)</span>
+          <input id="medicineBatch" name="batch" maxlength="80" autocomplete="off" placeholder="Nomor batch" class="h-11 min-w-0 rounded-xl border border-outline-variant/60 bg-white px-3 font-body-sm text-on-surface outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20">
+        </label>
+      </div>
+      <details class="rounded-xl bg-surface-container-low p-3">
+        <summary class="cursor-pointer font-label-sm text-label-sm font-semibold text-primary">Lihat teks yang terbaca dari foto</summary>
+        <pre id="ocrText" class="mt-2 max-h-32 overflow-auto whitespace-pre-wrap break-words font-body-sm text-body-sm text-on-surface-variant"></pre>
+      </details>
       <label class="flex flex-col gap-1 font-label-sm text-label-sm font-semibold text-on-surface-variant">
         Kondisi obat
         <select id="medicineCondition" name="condition" class="h-11 rounded-xl border border-outline-variant/60 bg-white px-3 font-body-md text-body-md text-on-surface outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20">
@@ -593,7 +625,7 @@ tailwind.config = {
       </label>
       <div class="flex items-start gap-2 rounded-xl bg-secondary-container/35 p-3">
         <span class="material-symbols-outlined text-[18px] text-secondary">recycling</span>
-        <p class="font-body-sm text-body-sm text-on-surface-variant">Jangan buang obat ke toilet atau tempat sampah. Pharvia bantu arahkan ke titik pengembalian yang aman.</p>
+        <p class="font-body-sm text-body-sm text-on-surface-variant">OCR membaca teks yang tampak pada foto saja. Tanggal kedaluwarsa, dosis, jumlah, dan produsen yang tidak terlihat tidak bisa ditebak—periksa kemasan asli.</p>
       </div>
       <p id="formStatus" class="font-label-sm text-label-sm text-error" role="alert" hidden></p>
       <button type="submit" class="flex h-[52px] w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-primary-container font-label-lg text-label-lg font-bold text-white shadow-[0_8px_20px_rgba(15,76,129,0.25)]">
@@ -655,11 +687,192 @@ tailwind.config = {
     let scanMode = 'barcode';
     let torchEnabled = false;
     let photoUrl = null;
+    let ocrWorkerPromise = null;
     let isScanningFrame = false;
     let cameraGeneration = 0;
     let permissionTimer = null;
 
     const setCameraStatus = (message) => { cameraStatus.textContent = message; };
+
+    const loadOcrEngine = () => {
+      if (window.Tesseract) {
+        return Promise.resolve(window.Tesseract);
+      }
+      if (!ocrWorkerPromise) {
+        ocrWorkerPromise = new Promise((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';
+          script.onload = () => window.Tesseract ? resolve(window.Tesseract) : reject(new Error('Library OCR tidak berhasil dimuat.'));
+          script.onerror = () => reject(new Error('Library OCR tidak dapat diunduh. Periksa koneksi internet.'));
+          document.head.append(script);
+        }).catch((error) => {
+          ocrWorkerPromise = null;
+          throw error;
+        });
+      }
+      return ocrWorkerPromise;
+    };
+
+    const parseExpiry = (text) => {
+      const monthNumbers = {
+        jan: 1, january: 1, januari: 1, feb: 2, february: 2, februari: 2,
+        mar: 3, march: 3, maret: 3, apr: 4, april: 4, may: 5, mei: 5,
+        jun: 6, june: 6, juni: 6, jul: 7, july: 7, juli: 7, aug: 8, august: 8, agustus: 8,
+        sep: 9, sept: 9, september: 9, oct: 10, october: 10, oktober: 10,
+        nov: 11, november: 11, dec: 12, december: 12, desember: 12
+      };
+      const lines = text.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+      for (const line of lines) {
+        if (!/\b(?:EXP(?:IRY|IRATION)?|ED|KEDALUWARSA|BEST\s*BEFORE|USE\s*BY)\b/i.test(line)) {
+          continue;
+        }
+        const iso = line.match(/\b(20\d{2})[-/.](0?[1-9]|1[0-2])(?:[-/.](0?[1-9]|[12]\d|3[01]))?\b/);
+        if (iso) {
+          const isoDay = line.match(/\b20\d{2}[-/.](?:0?[1-9]|1[0-2])[-/.](0?[1-9]|[12]\d|3[01])\b/);
+          const lastDay = new Date(Number(iso[1]), Number(iso[2]), 0).getDate();
+          return `${iso[1]}-${iso[2].padStart(2, '0')}-${isoDay ? isoDay[1].padStart(2, '0') : String(lastDay).padStart(2, '0')}`;
+        }
+        const dayFirst = line.match(/\b(0?[1-9]|[12]\d|3[01])\s*[/.-]\s*(0?[1-9]|1[0-2])\s*[/.-]\s*(20\d{2}|\d{2})\b/);
+        if (dayFirst) {
+          const year = dayFirst[3].length === 2 ? `20${dayFirst[3]}` : dayFirst[3];
+          return `${year}-${dayFirst[2].padStart(2, '0')}-${dayFirst[1].padStart(2, '0')}`;
+        }
+        const numeric = line.match(/\b(0?[1-9]|1[0-2])\s*[/.-]\s*(20\d{2}|\d{2})\b/);
+        if (numeric) {
+          const year = numeric[2].length === 2 ? `20${numeric[2]}` : numeric[2];
+          const lastDay = new Date(Number(year), Number(numeric[1]), 0).getDate();
+          return `${year}-${numeric[1].padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+        }
+        const named = line.match(/\b([A-Za-z]{3,10})\.?\s*[-,/]?\s*(20\d{2}|\d{2})\b/i);
+        if (named) {
+          const month = monthNumbers[named[1].toLowerCase()];
+          if (month) {
+            const year = named[2].length === 2 ? `20${named[2]}` : named[2];
+            const lastDay = new Date(Number(year), month, 0).getDate();
+            return `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+          }
+        }
+      }
+      return '';
+    };
+
+    const extractMedicineDetails = (text) => {
+      const lines = text.split(/\r?\n/).map((line) => line.replace(/[|_]/g, ' ').replace(/\s+/g, ' ').trim()).filter(Boolean);
+      const joined = lines.join(' ');
+      const strengthMatch = joined.match(/\b\d+(?:[.,]\d+)?\s?(?:mg|mcg|µg|ug|g|ml|mL|IU|UI|%)(?:\s*\/\s*\d+(?:[.,]\d+)?\s?(?:ml|mL|g))?\b/i);
+      const formPatterns = [
+        ['Tablet', /\b(?:tablet|tablets|tab(?:let)?|kaplet|caplet)\b/i],
+        ['Kapsul', /\b(?:capsule|capsules|kapsul|caps)\b/i],
+        ['Sirup', /\b(?:syrup|sirup|oral solution)\b/i],
+        ['Suspensi', /\b(?:suspension|suspensi)\b/i],
+        ['Tetes', /\b(?:drops|drop|tetes)\b/i],
+        ['Salep', /\b(?:ointment|salep)\b/i],
+        ['Krim', /\b(?:cream|krim)\b/i],
+        ['Inhaler', /\b(?:inhaler|inhalasi)\b/i],
+        ['Injeksi', /\b(?:injection|injeksi)\b/i]
+      ];
+      const matchedForm = formPatterns.find(([, pattern]) => pattern.test(joined));
+      const manufacturerLine = lines.find((line) => /\b(?:PT\.?|CV\.?|produced by|manufactured by|manufactured for|diproduksi oleh)\b/i.test(line));
+      const ingredientLine = lines.find((line) => /\b(?:komposisi|composition|active ingredients?|each (?:tablet|capsule|5 ?ml) contains?)\b/i.test(line));
+      const batchLine = lines.find((line) => /\b(?:batch|lot)\s*(?:no\.?|number|#|:)?\s*[A-Z0-9-]{3,}\b/i.test(line));
+      const strengthLineIndex = strengthMatch
+        ? lines.findIndex((line) => line.toLowerCase().includes(strengthMatch[0].toLowerCase()))
+        : -1;
+      const ignoredName = /\b(?:komposisi|composition|aturan pakai|dosis|batch|lot|exp|mfg|produsen|manufactured|diproduksi|tablet|kapsul|syrup|sirup|isi|contains)\b/i;
+      const stripStrength = (line) => line.replace(/\b\d+(?:[.,]\d+)?\s?(?:mg|mcg|µg|ug|g|ml|mL|IU|UI)\b.*$/i, '').trim();
+      const nameLine = strengthLineIndex >= 0
+        ? (stripStrength(lines[strengthLineIndex])
+          ? lines[strengthLineIndex]
+          : lines.slice(Math.max(0, strengthLineIndex - 2), strengthLineIndex).reverse().find((line) => !ignoredName.test(line)))
+        : lines.find((line) => /\b(?:paracetamol|acetaminophen|ibuprofen|amoxicillin|aspirin|loratadine|cetirizine|omeprazole|antacid)\b/i.test(line));
+      const quantityMatch = joined.match(/\b(?:isi|contains?|content|netto|pack(?:age)?\s*of)\s*[:.]?\s*(\d{1,3})\s*(tablet|tab|kapsul|capsule|caps|kaplet|ml|sachet|strip|pcs|pieces)?\b/i)
+        || joined.match(/\b(\d{1,3})\s*(tablet|tabs?|kapsul|capsules?|kaplet|sachets?|strips?|pcs|pieces)\b/i);
+      const name = nameLine
+        ? stripStrength(nameLine).replace(/[^a-zA-Z0-9().+\-/ ]/g, '').trim()
+        : '';
+      return {
+        name,
+        strength: strengthMatch?.[0]?.replace(/\s+/g, ' ') || '',
+        formType: matchedForm?.[0] || '',
+        ingredient: ingredientLine?.replace(/^.*?\b(?:komposisi|composition|active ingredients?|each (?:tablet|capsule|5 ?ml) contains?)\b\s*:?\s*/i, '').trim() || '',
+        manufacturer: manufacturerLine?.replace(/^(?:produced by|manufactured by|manufactured for|diproduksi oleh)\s*/i, '').trim() || '',
+        expiry: parseExpiry(text),
+        quantity: quantityMatch ? `${quantityMatch[1]}${quantityMatch[2] ? ` ${quantityMatch[2]}` : ''}` : '',
+        batch: batchLine?.replace(/^.*?\b(?:batch|lot)\s*(?:no\.?|number|#|:)?\s*/i, '').trim() || ''
+      };
+    };
+
+    const recognizePhoto = async (file) => {
+      let worker;
+      try {
+        document.getElementById('ocrText').textContent = '';
+        setCameraStatus('Memeriksa barcode pada foto...');
+        if (await createBarcodeDetector()) {
+          let image;
+          try {
+            image = await createImageBitmap(file);
+            const codes = await barcodeDetector.detect(image);
+            const barcode = codes.find((code) => code.rawValue)?.rawValue;
+            if (barcode) {
+              document.getElementById('medicineBarcode').value = barcode;
+            }
+          } finally {
+            image?.close();
+          }
+        }
+        setCameraStatus('Memuat OCR untuk membaca teks pada foto...');
+        const tesseract = await loadOcrEngine();
+        worker = await tesseract.createWorker('eng', 1, {
+          logger: (progress) => {
+            if (progress.status === 'recognizing text') {
+              setCameraStatus(`Membaca teks pada foto... ${Math.round((progress.progress || 0) * 100)}%`);
+            } else if (progress.status === 'loading language traineddata') {
+              setCameraStatus('Menyiapkan pembaca teks...');
+            }
+          }
+        });
+        const result = await worker.recognize(file);
+        const text = result.data.text.trim();
+        document.getElementById('ocrText').textContent = text || 'Tidak ada teks yang terbaca.';
+        const details = extractMedicineDetails(text);
+        if (details.name) document.getElementById('medicineName').value = details.name;
+        if (details.strength) document.getElementById('medicineStrength').value = details.strength;
+        if (details.formType) document.getElementById('medicineFormType').value = details.formType;
+        if (details.ingredient) document.getElementById('medicineIngredient').value = details.ingredient;
+        if (details.manufacturer) document.getElementById('medicineManufacturer').value = details.manufacturer;
+        if (details.expiry) document.getElementById('medicineExpiry').value = details.expiry;
+        if (details.quantity) document.getElementById('medicineQuantity').value = details.quantity;
+        if (details.batch) document.getElementById('medicineBatch').value = details.batch;
+
+        if (!text) {
+          setCameraStatus('Teks tidak terbaca. Coba foto lebih dekat, terang, dan fokus.');
+          revealForm('Tidak ada teks yang terbaca pada foto. Masukkan data dengan melihat kemasan asli.');
+          return;
+        }
+        const found = [
+          details.name && 'nama',
+          details.strength && 'dosis',
+          details.formType && 'bentuk',
+          details.ingredient && 'kandungan aktif',
+          details.expiry && 'kedaluwarsa',
+          details.quantity && 'jumlah',
+          details.manufacturer && 'produsen',
+          details.batch && 'batch/lot'
+        ].filter(Boolean);
+        setCameraStatus(`Teks terbaca (${Math.round(result.data.confidence)}% OCR). Periksa hasil sebelum menyimpan.`);
+        revealForm('Hasil OCR bisa keliru. Foto diproses di browser; periksa setiap kolom dan isi tanggal kedaluwarsa dari kemasan asli.');
+        scanNoticeText.textContent = found.length
+          ? `Terbaca: ${found.join(', ')}. Foto diproses di browser. Cocokkan semua nilai dengan kemasan asli.`
+          : 'Teks ditemukan, tetapi detail obat tidak dapat dikenali otomatis. Isi form dengan melihat kemasan asli.';
+      } catch (error) {
+        setCameraStatus(`Foto gagal dianalisis: ${error.message}`);
+        revealForm('OCR tidak tersedia saat ini. Isi detail obat dengan melihat kemasan asli.');
+      } finally {
+        if (worker) {
+          await worker.terminate();
+        }
+      }
+    };
 
     const setFormMessage = (message, isError = true) => {
       formStatus.textContent = message;
@@ -690,8 +903,14 @@ tailwind.config = {
       name.textContent = deposit.name;
       const meta = document.createElement('span');
       meta.className = 'block truncate font-body-sm text-body-sm text-on-surface-variant';
-      meta.textContent = `${deposit.quantity} kemasan · ${deposit.condition}`;
-      details.append(name, meta);
+      meta.textContent = [deposit.strength, deposit.formType, deposit.quantity, `${deposit.depositCount || 1} kemasan disetor`, deposit.condition].filter(Boolean).join(' · ');
+      const extra = document.createElement('span');
+      extra.className = 'block truncate font-body-sm text-body-sm text-on-surface-variant';
+      extra.textContent = [deposit.ingredient, deposit.manufacturer, deposit.batch ? `Lot ${deposit.batch}` : ''].filter(Boolean).join(' · ');
+      const expiry = document.createElement('span');
+      expiry.className = 'block truncate font-body-sm text-outline';
+      expiry.textContent = deposit.expiry ? `ED ${deposit.expiry}` : 'Tanggal kedaluwarsa belum dicatat';
+      details.append(name, meta, extra, expiry);
       const status = document.createElement('span');
       status.className = 'rounded-full bg-secondary-container/50 px-2 py-1 font-label-sm text-label-sm font-bold text-on-secondary-container';
       status.textContent = 'Baru';
@@ -889,9 +1108,13 @@ tailwind.config = {
           scanVideoFrame();
         }
       } else {
-        modeHint.textContent = 'Foto kemasan sebagai referensi, lalu lengkapi data manual';
-        scanNoticeText.textContent = 'Pengenalan teks AI belum tersedia. Foto hanya menjadi referensi; isi nama obat dan kedaluwarsa secara manual.';
-        await startCamera();
+        stopCamera();
+        cameraPreview.classList.add('hidden');
+        modeHint.textContent = 'Upload atau foto label obat untuk membaca teks';
+        scanNoticeText.textContent = 'OCR membaca teks kemasan di browser dan membantu mengisi data. Hasil bukan verifikasi medis—periksa setiap nilai.';
+        setCameraStatus('Siap membaca tulisan pada foto kemasan.');
+        capturedPreview.classList.add('hidden');
+        medicineForm.hidden = true;
       }
     };
 
@@ -904,6 +1127,10 @@ tailwind.config = {
 
     const closeScanner = () => {
       stopCamera();
+      if (photoUrl) {
+        URL.revokeObjectURL(photoUrl);
+        photoUrl = null;
+      }
       scannerScreen.hidden = true;
       homeScreen.hidden = false;
       document.body.style.overflow = '';
@@ -934,38 +1161,33 @@ tailwind.config = {
       if (!file) {
         return;
       }
+      photoInput.value = '';
+      if (!file.type.startsWith('image/')) {
+        setCameraStatus('Pilih file gambar seperti JPG, PNG, atau WEBP.');
+        return;
+      }
+      if (file.size > 12 * 1024 * 1024) {
+        setCameraStatus('Ukuran gambar maksimal 12 MB. Kompres gambar atau pilih foto lain.');
+        return;
+      }
+      if (scanMode !== 'package') await setMode('package');
       if (photoUrl) {
         URL.revokeObjectURL(photoUrl);
       }
       photoUrl = URL.createObjectURL(file);
       capturedPreview.src = photoUrl;
       capturedPreview.classList.remove('hidden');
-      if (scanMode === 'package') {
-        cameraPreview.classList.add('hidden');
-        setCameraStatus('Foto kemasan siap digunakan sebagai referensi.');
-        revealForm('Foto disimpan hanya sebagai referensi di layar ini. Lengkapi nama dan tanggal kedaluwarsa secara manual.');
-        return;
-      }
-      if (!barcodeDetector) {
-        setCameraStatus('Pembacaan barcode dari foto tidak didukung. Lengkapi data obat secara manual.');
-        revealForm('Pembaca barcode foto tidak tersedia di browser ini. Isi nama dan tanggal kedaluwarsa secara manual.');
-        return;
-      }
-      setCameraStatus('Mencari barcode di dalam foto...');
+      stopCamera();
+      cameraPreview.classList.add('hidden');
+      medicineForm.reset();
+      document.getElementById('medicineQuantity').value = '';
+      setFormMessage('');
       try {
-        const image = await createImageBitmap(file);
-        const codes = await barcodeDetector.detect(image);
-        image.close();
-        const value = codes.find((code) => code.rawValue)?.rawValue;
-        if (value) {
-          document.getElementById('medicineBarcode').value = value;
-          setCameraStatus('Barcode terbaca dari foto. Lengkapi detail obat.');
-          revealForm('Barcode ditemukan. Nama obat dan tanggal kedaluwarsa tetap perlu diverifikasi manual.');
-        } else {
-          setCameraStatus('Barcode tidak ditemukan di foto. Kamu bisa coba lagi atau isi data secara manual.');
-        }
+        await recognizePhoto(file);
       } catch (error) {
-        setCameraStatus(`Foto tidak dapat dipindai: ${error.message}`);
+        console.error('Tidak dapat menganalisis foto obat:', error);
+        setCameraStatus(`Foto gagal dianalisis: ${error.message}`);
+        revealForm('Analisis foto gagal. Isi data obat secara manual dengan melihat kemasan asli.');
       }
     });
 
@@ -1000,13 +1222,19 @@ tailwind.config = {
         id: `PHV-${Date.now().toString().slice(-6)}`,
         name: document.getElementById('medicineName').value.trim(),
         barcode: document.getElementById('medicineBarcode').value.trim(),
+        strength: document.getElementById('medicineStrength').value.trim(),
+        formType: document.getElementById('medicineFormType').value.trim(),
+        ingredient: document.getElementById('medicineIngredient').value.trim(),
+        manufacturer: document.getElementById('medicineManufacturer').value.trim(),
         expiry: document.getElementById('medicineExpiry').value,
-        quantity: Number(document.getElementById('medicineQuantity').value),
+        quantity: document.getElementById('medicineQuantity').value.trim(),
+        depositCount: Number(document.getElementById('medicineDepositCount').value),
+        batch: document.getElementById('medicineBatch').value.trim(),
         condition: document.getElementById('medicineCondition').value,
         createdAt: new Date().toISOString()
       };
-      if (!deposit.name || !Number.isInteger(deposit.quantity) || deposit.quantity < 1) {
-        setFormMessage('Nama obat dan jumlah kemasan harus diisi dengan benar.');
+      if (!deposit.name || !deposit.expiry || !Number.isInteger(deposit.depositCount) || deposit.depositCount < 1) {
+        setFormMessage('Nama obat, jumlah kemasan yang disetor, dan tanggal kedaluwarsa wajib diisi dari informasi yang sudah diperiksa.');
         return;
       }
       try {
@@ -1016,6 +1244,7 @@ tailwind.config = {
         addDepositCard(deposit);
         document.getElementById('depositCount').textContent = `Semua (${deposits.length + 1})`;
         medicineForm.reset();
+        document.getElementById('medicineQuantity').value = '';
         medicineForm.hidden = true;
         scanNoticeText.textContent = `${deposit.name} berhasil ditambahkan ke daftar setoran. Kamu bisa memindai obat lain.`;
         scanNotice.classList.add('bg-secondary-container/40');
