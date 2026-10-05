@@ -141,6 +141,16 @@ tailwind.config = {
   button:active, a:active { transform: scale(0.97); }
   .scan-button { animation: scan-glow 2.6s ease-in-out infinite; }
   .scan-button .material-symbols-outlined { animation: scan-icon-drift 2.6s ease-in-out infinite; }
+  [hidden] { display: none !important; }
+  .scan-screen { height: 100dvh; }
+  .camera-stage { min-height: 340px; height: 43dvh; max-height: 460px; }
+  .scan-laser {
+    animation: scan-laser-move 2.4s ease-in-out infinite;
+  }
+  @keyframes scan-laser-move {
+    0%, 100% { top: 8px; opacity: .35; }
+    50% { top: calc(100% - 10px); opacity: 1; }
+  }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
   }
@@ -183,7 +193,7 @@ tailwind.config = {
 </header>
 
 <main class="flex flex-col relative w-full pt-16 pb-28 bg-surface min-h-screen">
-<div class="flex flex-col w-full">
+<div id="homeScreen" class="flex flex-col w-full">
 
 <section class="px-margin pt-space-md pb-space-sm flex items-center justify-between">
   <div class="flex flex-col min-w-0 pr-space-sm">
@@ -250,7 +260,7 @@ tailwind.config = {
     <span class="font-label-sm text-label-sm text-secondary font-semibold uppercase tracking-wider">Layanan Mandiri</span>
   </div>
   <div class="grid grid-cols-4 gap-gutter-sm">
-    <button class="group flex flex-col items-center text-center p-2 rounded-xl transition-colors active:bg-surface-container" type="button">
+    <button data-open-scan class="group flex flex-col items-center text-center p-2 rounded-xl transition-colors active:bg-surface-container" type="button">
       <div class="w-14 h-14 rounded-2xl bg-surface-container-lowest shadow-sm flex items-center justify-center text-primary group-active:scale-95 transition-transform">
         <span class="material-symbols-outlined text-[26px] text-primary" style="font-variation-settings: 'FILL' 1;">qr_code_scanner</span>
       </div>
@@ -283,7 +293,7 @@ tailwind.config = {
       <h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">Setoran Aktif</h3>
       <span class="w-2.5 h-2.5 rounded-full bg-secondary animate-pulse"></span>
     </div>
-    <a class="font-label-md text-label-md text-secondary font-semibold hover:underline" href="#">Semua (1)</a>
+    <a id="depositCount" class="font-label-md text-label-md text-secondary font-semibold hover:underline" href="#">Semua (1)</a>
   </div>
   <div class="w-full bg-surface-container-lowest rounded-2xl p-space-md shadow-sm">
     <div class="flex items-center justify-between gap-2 pb-space-sm">
@@ -337,6 +347,7 @@ tailwind.config = {
       </button>
     </div>
   </div>
+  <div id="scanDepositList" class="mt-space-sm flex flex-col gap-space-sm"></div>
 </section>
 
 <section class="px-margin pt-space-lg">
@@ -494,6 +505,104 @@ tailwind.config = {
 </section>
 
 </div>
+
+<section id="scannerScreen" class="scan-screen fixed inset-y-0 left-1/2 z-[60] flex w-full max-w-[480px] -translate-x-1/2 flex-col overflow-y-auto bg-surface pb-20" aria-label="Scan obat" hidden>
+  <div class="camera-stage relative flex w-full flex-col justify-between overflow-hidden bg-inverse-surface">
+    <video id="cameraPreview" class="absolute inset-0 h-full w-full object-cover" autoplay playsinline muted aria-label="Tampilan kamera"></video>
+    <img id="capturedPreview" class="absolute inset-0 hidden h-full w-full object-cover" alt="Foto kemasan obat">
+    <div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-inverse-surface/80 via-inverse-surface/20 to-inverse-surface/95"></div>
+    <div class="relative z-10 flex items-center justify-between px-margin pt-safe">
+      <button id="closeScanner" type="button" aria-label="Tutup pemindai" class="mt-2 flex h-10 w-10 items-center justify-center rounded-full bg-inverse-surface/70 text-inverse-on-surface backdrop-blur-md">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+      <div class="flex flex-col items-center text-center">
+        <span class="font-headline-sm text-headline-sm font-bold text-white">Scan Obat</span>
+        <span class="font-body-sm text-white/80">Kenali obat sebelum disetor</span>
+      </div>
+      <button id="flashToggle" type="button" aria-label="Nyalakan lampu kamera" aria-pressed="false" class="mt-2 flex h-10 w-10 items-center justify-center rounded-full bg-inverse-surface/70 text-white backdrop-blur-md">
+        <span class="material-symbols-outlined">flash_on</span>
+      </button>
+    </div>
+
+    <div class="relative z-10 mx-auto mt-3 flex items-center rounded-full bg-inverse-surface/75 p-1 backdrop-blur-md" role="tablist" aria-label="Mode pemindaian">
+      <button type="button" class="scan-mode rounded-full bg-secondary-container px-3 py-2 font-label-sm text-label-sm font-bold text-on-secondary-container" data-mode="barcode" role="tab" aria-selected="true">Barcode</button>
+      <button type="button" class="scan-mode rounded-full px-3 py-2 font-label-sm text-label-sm text-white" data-mode="package" role="tab" aria-selected="false">Kemasan AI</button>
+      <button type="button" class="scan-mode rounded-full px-3 py-2 font-label-sm text-label-sm text-white" data-mode="manual" role="tab" aria-selected="false">Manual</button>
+    </div>
+
+    <div id="viewfinder" class="relative z-10 m-auto flex h-40 w-[min(72vw,280px)] items-center justify-center">
+      <span class="absolute left-0 top-0 h-7 w-7 rounded-tl-xl border-l-[3px] border-t-[3px] border-secondary-container shadow-[0_0_10px_rgba(134,242,228,0.5)]"></span>
+      <span class="absolute right-0 top-0 h-7 w-7 rounded-tr-xl border-r-[3px] border-t-[3px] border-secondary-container shadow-[0_0_10px_rgba(134,242,228,0.5)]"></span>
+      <span class="absolute bottom-0 left-0 h-7 w-7 rounded-bl-xl border-b-[3px] border-l-[3px] border-secondary-container shadow-[0_0_10px_rgba(134,242,228,0.5)]"></span>
+      <span class="absolute bottom-0 right-0 h-7 w-7 rounded-br-xl border-b-[3px] border-r-[3px] border-secondary-container shadow-[0_0_10px_rgba(134,242,228,0.5)]"></span>
+      <span id="scanLaser" class="scan-laser absolute inset-x-2 h-0.5 bg-gradient-to-r from-transparent via-secondary-container to-transparent shadow-[0_0_12px_#86f2e4]"></span>
+      <span class="material-symbols-outlined text-[30px] text-secondary-container/60">filter_center_focus</span>
+    </div>
+    <div class="relative z-10 flex flex-col items-center gap-2 px-5 pb-4 text-center">
+      <p id="cameraStatus" class="font-label-sm text-label-sm text-white" role="status" aria-live="polite">Kamera akan aktif saat kamu membuka Scan.</p>
+      <p id="modeHint" class="rounded-full bg-inverse-surface/80 px-3.5 py-1 font-label-sm text-label-sm text-secondary-fixed">Arahkan barcode obat ke dalam bingkai</p>
+      <button id="choosePhoto" type="button" class="flex items-center gap-1 rounded-full bg-white/15 px-3 py-1.5 font-label-sm text-white backdrop-blur-md">
+        <span class="material-symbols-outlined text-[17px]">photo_camera</span>
+        <span>Ambil / pilih foto</span>
+      </button>
+      <input id="photoInput" class="hidden" type="file" accept="image/*" capture="environment">
+    </div>
+  </div>
+
+  <div class="relative z-20 -mt-4 flex flex-col gap-space-md rounded-t-[28px] bg-surface-container-lowest px-margin pb-6 pt-4 shadow-[0_-8px_32px_rgba(15,76,129,0.14)]">
+    <div class="mx-auto h-1.5 w-12 rounded-full bg-surface-variant"></div>
+    <div id="scanNotice" class="flex items-start gap-2.5 rounded-xl bg-primary-fixed/50 p-3" role="status" aria-live="polite">
+      <span class="material-symbols-outlined mt-0.5 text-[20px] text-primary">info</span>
+      <p id="scanNoticeText" class="font-body-sm text-body-sm text-on-surface-variant">Izinkan kamera untuk memindai barcode. Data obat bisa dilengkapi dan dikoreksi sebelum disimpan.</p>
+    </div>
+
+    <form id="medicineForm" class="flex flex-col gap-3" hidden>
+      <div class="flex items-center gap-2 rounded-xl bg-surface-container px-3.5 py-2.5">
+        <span class="material-symbols-outlined text-[20px] text-secondary">verified</span>
+        <div class="min-w-0 flex-1">
+          <span class="block font-label-md text-label-md font-bold text-primary">Periksa data obat</span>
+          <span class="block font-body-sm text-body-sm text-on-surface-variant">Pastikan informasi sesuai kemasan.</span>
+        </div>
+      </div>
+      <label class="flex flex-col gap-1 font-label-sm text-label-sm font-semibold text-on-surface-variant">
+        Nama obat
+        <input id="medicineName" name="medicineName" required maxlength="100" autocomplete="off" placeholder="Contoh: Paracetamol 500 mg" class="h-11 rounded-xl border border-outline-variant/60 bg-white px-3 font-body-md text-body-md text-on-surface outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20">
+      </label>
+      <label class="flex flex-col gap-1 font-label-sm text-label-sm font-semibold text-on-surface-variant">
+        Nomor barcode <span class="font-normal">(opsional)</span>
+        <input id="medicineBarcode" name="medicineBarcode" maxlength="120" autocomplete="off" placeholder="Hasil barcode akan muncul di sini" class="h-11 rounded-xl border border-outline-variant/60 bg-white px-3 font-body-md text-body-md text-on-surface outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20">
+      </label>
+      <div class="grid grid-cols-2 gap-3">
+        <label class="flex min-w-0 flex-col gap-1 font-label-sm text-label-sm font-semibold text-on-surface-variant">
+          Kedaluwarsa
+          <input id="medicineExpiry" name="expiry" type="date" required class="h-11 min-w-0 rounded-xl border border-outline-variant/60 bg-white px-2 font-body-sm text-on-surface outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20">
+        </label>
+        <label class="flex min-w-0 flex-col gap-1 font-label-sm text-label-sm font-semibold text-on-surface-variant">
+          Jumlah kemasan
+          <input id="medicineQuantity" name="quantity" type="number" min="1" max="999" value="1" required class="h-11 min-w-0 rounded-xl border border-outline-variant/60 bg-white px-3 font-body-md text-body-md text-on-surface outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20">
+        </label>
+      </div>
+      <label class="flex flex-col gap-1 font-label-sm text-label-sm font-semibold text-on-surface-variant">
+        Kondisi obat
+        <select id="medicineCondition" name="condition" class="h-11 rounded-xl border border-outline-variant/60 bg-white px-3 font-body-md text-body-md text-on-surface outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20">
+          <option>Aman Disimpan</option>
+          <option>Mendekati ED</option>
+          <option>Kedaluwarsa</option>
+          <option>Rusak / Cair</option>
+        </select>
+      </label>
+      <div class="flex items-start gap-2 rounded-xl bg-secondary-container/35 p-3">
+        <span class="material-symbols-outlined text-[18px] text-secondary">recycling</span>
+        <p class="font-body-sm text-body-sm text-on-surface-variant">Jangan buang obat ke toilet atau tempat sampah. Pharvia bantu arahkan ke titik pengembalian yang aman.</p>
+      </div>
+      <p id="formStatus" class="font-label-sm text-label-sm text-error" role="alert" hidden></p>
+      <button type="submit" class="flex h-[52px] w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-primary-container font-label-lg text-label-lg font-bold text-white shadow-[0_8px_20px_rgba(15,76,129,0.25)]">
+        <span class="material-symbols-outlined text-[20px]">add_circle</span>
+        <span>Tambahkan ke Setoran</span>
+      </button>
+    </form>
+  </div>
+</section>
 </main>
 
 <nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_-4px_20px_rgba(15,76,129,0.06)]" data-active-classes="text-primary font-bold">
@@ -523,9 +632,409 @@ tailwind.config = {
   </div>
 </nav>
 <script>
-  document.querySelectorAll('button, article').forEach((element) => {
-    element.addEventListener('touchstart', () => {}, { passive: true });
-  });
+  (() => {
+    const homeScreen = document.getElementById('homeScreen');
+    const scannerScreen = document.getElementById('scannerScreen');
+    const cameraPreview = document.getElementById('cameraPreview');
+    const capturedPreview = document.getElementById('capturedPreview');
+    const cameraStatus = document.getElementById('cameraStatus');
+    const modeHint = document.getElementById('modeHint');
+    const scanNoticeText = document.getElementById('scanNoticeText');
+    const scanNotice = document.getElementById('scanNotice');
+    const medicineForm = document.getElementById('medicineForm');
+    const formStatus = document.getElementById('formStatus');
+    const photoInput = document.getElementById('photoInput');
+    const videoConstraints = {
+      audio: false,
+      video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }
+    };
+    const storageKey = 'pharvia.scanDeposits';
+    let cameraStream = null;
+    let barcodeDetector = null;
+    let scanTimer = null;
+    let scanMode = 'barcode';
+    let torchEnabled = false;
+    let photoUrl = null;
+    let isScanningFrame = false;
+    let cameraGeneration = 0;
+    let permissionTimer = null;
+
+    const setCameraStatus = (message) => { cameraStatus.textContent = message; };
+
+    const setFormMessage = (message, isError = true) => {
+      formStatus.textContent = message;
+      formStatus.classList.toggle('text-error', isError);
+      formStatus.classList.toggle('text-secondary', !isError);
+      formStatus.hidden = !message;
+    };
+
+    const loadDeposits = () => {
+      const saved = localStorage.getItem(storageKey);
+      const deposits = saved ? JSON.parse(saved) : [];
+      if (!Array.isArray(deposits)) {
+        throw new Error('Format data setoran tersimpan tidak valid.');
+      }
+      return deposits;
+    };
+
+    const addDepositCard = (deposit) => {
+      const card = document.createElement('article');
+      card.className = 'flex items-center gap-3 rounded-2xl bg-surface-container-lowest p-3 shadow-sm';
+      const icon = document.createElement('span');
+      icon.className = 'material-symbols-outlined flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-secondary-container/50 text-secondary';
+      icon.textContent = 'medication';
+      const details = document.createElement('div');
+      details.className = 'min-w-0 flex-1';
+      const name = document.createElement('span');
+      name.className = 'block truncate font-label-md text-label-md font-bold text-primary';
+      name.textContent = deposit.name;
+      const meta = document.createElement('span');
+      meta.className = 'block truncate font-body-sm text-body-sm text-on-surface-variant';
+      meta.textContent = `${deposit.quantity} kemasan · ${deposit.condition}`;
+      details.append(name, meta);
+      const status = document.createElement('span');
+      status.className = 'rounded-full bg-secondary-container/50 px-2 py-1 font-label-sm text-label-sm font-bold text-on-secondary-container';
+      status.textContent = 'Baru';
+      card.append(icon, details, status);
+      document.getElementById('scanDepositList').prepend(card);
+    };
+
+    const renderSavedDeposits = () => {
+      try {
+        const deposits = loadDeposits();
+        deposits.forEach(addDepositCard);
+        document.getElementById('depositCount').textContent = `Semua (${deposits.length + 1})`;
+      } catch (error) {
+        console.error('Tidak dapat memuat setoran hasil scan:', error);
+      }
+    };
+
+    const stopDetection = () => {
+      if (scanTimer !== null) {
+        window.clearTimeout(scanTimer);
+        scanTimer = null;
+      }
+      isScanningFrame = false;
+    };
+
+    const stopCamera = () => {
+      cameraGeneration += 1;
+      if (permissionTimer !== null) {
+        window.clearTimeout(permissionTimer);
+        permissionTimer = null;
+      }
+      stopDetection();
+      if (cameraStream) {
+        cameraStream.getTracks().forEach((track) => track.stop());
+        cameraStream = null;
+      }
+      cameraPreview.srcObject = null;
+      torchEnabled = false;
+      const flashButton = document.getElementById('flashToggle');
+      flashButton.setAttribute('aria-pressed', 'false');
+      flashButton.classList.remove('bg-secondary-container', 'text-on-secondary-container');
+      flashButton.classList.add('text-white');
+      flashButton.setAttribute('aria-label', 'Nyalakan lampu kamera');
+    };
+
+    const revealForm = (message) => {
+      medicineForm.hidden = false;
+      scanNoticeText.textContent = message;
+      setFormMessage('');
+      document.getElementById('medicineName').focus({ preventScroll: true });
+    };
+
+    const scanVideoFrame = async () => {
+      if (!barcodeDetector || scanMode !== 'barcode' || !cameraStream || isScanningFrame) {
+        return;
+      }
+      if (cameraPreview.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) {
+        scanTimer = window.setTimeout(scanVideoFrame, 300);
+        return;
+      }
+      isScanningFrame = true;
+      try {
+        const codes = await barcodeDetector.detect(cameraPreview);
+        const value = codes.find((code) => code.rawValue)?.rawValue;
+        if (value) {
+          stopDetection();
+          document.getElementById('medicineBarcode').value = value;
+          setCameraStatus('Barcode terbaca. Lengkapi detail obat sebelum disimpan.');
+          revealForm('Barcode terbaca. Nama obat dan tanggal kedaluwarsa perlu kamu periksa dan isi sendiri.');
+          return;
+        }
+      } catch (error) {
+        stopDetection();
+        setCameraStatus(`Pemindaian barcode gagal: ${error.message}`);
+        return;
+      }
+      isScanningFrame = false;
+      scanTimer = window.setTimeout(scanVideoFrame, 350);
+    };
+
+    const createBarcodeDetector = async () => {
+      barcodeDetector = null;
+      if (!('BarcodeDetector' in window)) {
+        return false;
+      }
+      try {
+        const supported = await window.BarcodeDetector.getSupportedFormats();
+        const formats = ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'code_39', 'qr_code']
+          .filter((format) => supported.includes(format));
+        if (!formats.length) {
+          return false;
+        }
+        barcodeDetector = new window.BarcodeDetector({ formats });
+        return true;
+      } catch (error) {
+        console.error('Barcode Detection API tidak dapat diinisialisasi:', error);
+        return false;
+      }
+    };
+
+    const startCamera = async () => {
+      if (scanMode === 'manual' || cameraStream) {
+        return;
+      }
+      if (!navigator.mediaDevices?.getUserMedia) {
+        setCameraStatus('Kamera tidak tersedia di browser ini. Pilih foto kemasan atau gunakan mode Manual.');
+        return;
+      }
+      const requestGeneration = ++cameraGeneration;
+      setCameraStatus('Meminta izin kamera...');
+      permissionTimer = window.setTimeout(() => {
+        if (requestGeneration === cameraGeneration && !cameraStream) {
+          setCameraStatus('Izin kamera belum diberikan. Izinkan di browser, atau pilih mode Manual.');
+        }
+      }, 8000);
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia(videoConstraints);
+        if (permissionTimer !== null) {
+          window.clearTimeout(permissionTimer);
+          permissionTimer = null;
+        }
+        if (requestGeneration !== cameraGeneration || scannerScreen.hidden || scanMode === 'manual') {
+          stream.getTracks().forEach((track) => track.stop());
+          return;
+        }
+        cameraStream = stream;
+        cameraPreview.srcObject = cameraStream;
+        await cameraPreview.play();
+        if (scanMode === 'barcode') {
+          const isSupported = await createBarcodeDetector();
+          if (isSupported) {
+            setCameraStatus('Kamera aktif. Arahkan barcode ke dalam bingkai.');
+            scanVideoFrame();
+          } else {
+            setCameraStatus('Kamera aktif, tetapi browser belum mendukung pembaca barcode. Gunakan foto atau mode Manual.');
+          }
+        } else {
+          setCameraStatus('Kamera aktif. Ambil foto kemasan sebagai referensi.');
+        }
+      } catch (error) {
+        if (permissionTimer !== null) {
+          window.clearTimeout(permissionTimer);
+          permissionTimer = null;
+        }
+        if (requestGeneration !== cameraGeneration) {
+          return;
+        }
+        stopCamera();
+        if (error.name === 'NotAllowedError' || error.name === 'SecurityError') {
+          setCameraStatus('Izin kamera ditolak. Aktifkan izin kamera di browser atau gunakan mode Manual.');
+        } else if (error.name === 'NotFoundError' || error.name === 'OverconstrainedError') {
+          setCameraStatus('Kamera tidak ditemukan. Gunakan foto kemasan atau mode Manual.');
+        } else {
+          setCameraStatus(`Kamera tidak dapat dibuka: ${error.message}`);
+        }
+      }
+    };
+
+    const setMode = async (mode) => {
+      scanMode = mode;
+      document.querySelectorAll('.scan-mode').forEach((button) => {
+        const active = button.dataset.mode === mode;
+        button.setAttribute('aria-selected', String(active));
+        button.classList.toggle('bg-secondary-container', active);
+        button.classList.toggle('text-on-secondary-container', active);
+        button.classList.toggle('font-bold', active);
+        button.classList.toggle('text-white', !active);
+      });
+      stopDetection();
+      capturedPreview.classList.add('hidden');
+      cameraPreview.classList.remove('hidden');
+      if (photoUrl) {
+        URL.revokeObjectURL(photoUrl);
+        photoUrl = null;
+      }
+      if (mode === 'manual') {
+        stopCamera();
+        cameraPreview.classList.add('hidden');
+        document.getElementById('viewfinder').classList.add('hidden');
+        document.getElementById('choosePhoto').classList.add('hidden');
+        setCameraStatus('Mode input manual aktif.');
+        modeHint.textContent = 'Isi data obat dari label kemasan';
+        scanNoticeText.textContent = 'Isi data obat sesuai label kemasan. Pastikan nama dan tanggal kedaluwarsa benar.';
+        revealForm('Isi data obat dari label kemasan. Tidak ada hasil pemindaian otomatis pada mode Manual.');
+        return;
+      }
+      document.getElementById('viewfinder').classList.remove('hidden');
+      document.getElementById('choosePhoto').classList.remove('hidden');
+      medicineForm.hidden = true;
+      if (mode === 'barcode') {
+        modeHint.textContent = 'Arahkan barcode obat ke dalam bingkai';
+        scanNoticeText.textContent = 'Izinkan kamera untuk memindai barcode. Data obat bisa dilengkapi dan dikoreksi sebelum disimpan.';
+        await startCamera();
+        if (barcodeDetector && cameraStream) {
+          scanVideoFrame();
+        }
+      } else {
+        modeHint.textContent = 'Foto kemasan sebagai referensi, lalu lengkapi data manual';
+        scanNoticeText.textContent = 'Pengenalan teks AI belum tersedia. Foto hanya menjadi referensi; isi nama obat dan kedaluwarsa secara manual.';
+        await startCamera();
+      }
+    };
+
+    const openScanner = () => {
+      homeScreen.hidden = true;
+      scannerScreen.hidden = false;
+      document.body.style.overflow = 'hidden';
+      setMode('barcode');
+    };
+
+    const closeScanner = () => {
+      stopCamera();
+      scannerScreen.hidden = true;
+      homeScreen.hidden = false;
+      document.body.style.overflow = '';
+      document.querySelector('[data-path="scan"]').setAttribute('aria-current', 'false');
+    };
+
+    document.querySelectorAll('[data-open-scan], [data-path="scan"]').forEach((control) => {
+      control.addEventListener('click', (event) => {
+        event.preventDefault();
+        openScanner();
+      });
+    });
+    document.querySelector('[data-path="beranda"]').addEventListener('click', (event) => {
+      event.preventDefault();
+      if (!scannerScreen.hidden) {
+        closeScanner();
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+    document.getElementById('closeScanner').addEventListener('click', closeScanner);
+    document.querySelectorAll('.scan-mode').forEach((button) => {
+      button.addEventListener('click', () => setMode(button.dataset.mode));
+    });
+    document.getElementById('choosePhoto').addEventListener('click', () => photoInput.click());
+
+    photoInput.addEventListener('change', async () => {
+      const file = photoInput.files?.[0];
+      if (!file) {
+        return;
+      }
+      if (photoUrl) {
+        URL.revokeObjectURL(photoUrl);
+      }
+      photoUrl = URL.createObjectURL(file);
+      capturedPreview.src = photoUrl;
+      capturedPreview.classList.remove('hidden');
+      if (scanMode === 'package') {
+        cameraPreview.classList.add('hidden');
+        setCameraStatus('Foto kemasan siap digunakan sebagai referensi.');
+        revealForm('Foto disimpan hanya sebagai referensi di layar ini. Lengkapi nama dan tanggal kedaluwarsa secara manual.');
+        return;
+      }
+      if (!barcodeDetector) {
+        setCameraStatus('Pembacaan barcode dari foto tidak didukung. Lengkapi data obat secara manual.');
+        revealForm('Pembaca barcode foto tidak tersedia di browser ini. Isi nama dan tanggal kedaluwarsa secara manual.');
+        return;
+      }
+      setCameraStatus('Mencari barcode di dalam foto...');
+      try {
+        const image = await createImageBitmap(file);
+        const codes = await barcodeDetector.detect(image);
+        image.close();
+        const value = codes.find((code) => code.rawValue)?.rawValue;
+        if (value) {
+          document.getElementById('medicineBarcode').value = value;
+          setCameraStatus('Barcode terbaca dari foto. Lengkapi detail obat.');
+          revealForm('Barcode ditemukan. Nama obat dan tanggal kedaluwarsa tetap perlu diverifikasi manual.');
+        } else {
+          setCameraStatus('Barcode tidak ditemukan di foto. Kamu bisa coba lagi atau isi data secara manual.');
+        }
+      } catch (error) {
+        setCameraStatus(`Foto tidak dapat dipindai: ${error.message}`);
+      }
+    });
+
+    document.getElementById('flashToggle').addEventListener('click', async (event) => {
+      const button = event.currentTarget;
+      const track = cameraStream?.getVideoTracks()[0];
+      const capabilities = track?.getCapabilities?.();
+      if (!track || !capabilities?.torch) {
+        setCameraStatus('Lampu flash tidak tersedia pada kamera ini.');
+        return;
+      }
+      try {
+        torchEnabled = !torchEnabled;
+        await track.applyConstraints({ advanced: [{ torch: torchEnabled }] });
+        button.setAttribute('aria-pressed', String(torchEnabled));
+        button.classList.toggle('bg-secondary-container', torchEnabled);
+        button.classList.toggle('text-on-secondary-container', torchEnabled);
+        button.classList.toggle('text-white', !torchEnabled);
+        button.setAttribute('aria-label', torchEnabled ? 'Matikan lampu kamera' : 'Nyalakan lampu kamera');
+      } catch (error) {
+        torchEnabled = false;
+        setCameraStatus(`Lampu flash tidak dapat dinyalakan: ${error.message}`);
+      }
+    });
+
+    medicineForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      if (!medicineForm.reportValidity()) {
+        return;
+      }
+      const deposit = {
+        id: `PHV-${Date.now().toString().slice(-6)}`,
+        name: document.getElementById('medicineName').value.trim(),
+        barcode: document.getElementById('medicineBarcode').value.trim(),
+        expiry: document.getElementById('medicineExpiry').value,
+        quantity: Number(document.getElementById('medicineQuantity').value),
+        condition: document.getElementById('medicineCondition').value,
+        createdAt: new Date().toISOString()
+      };
+      if (!deposit.name || !Number.isInteger(deposit.quantity) || deposit.quantity < 1) {
+        setFormMessage('Nama obat dan jumlah kemasan harus diisi dengan benar.');
+        return;
+      }
+      try {
+        const deposits = loadDeposits();
+        deposits.unshift(deposit);
+        localStorage.setItem(storageKey, JSON.stringify(deposits));
+        addDepositCard(deposit);
+        document.getElementById('depositCount').textContent = `Semua (${deposits.length + 1})`;
+        medicineForm.reset();
+        medicineForm.hidden = true;
+        scanNoticeText.textContent = `${deposit.name} berhasil ditambahkan ke daftar setoran. Kamu bisa memindai obat lain.`;
+        scanNotice.classList.add('bg-secondary-container/40');
+        setCameraStatus('Obat berhasil ditambahkan ke setoran.');
+        if (scanMode === 'barcode' && cameraStream && barcodeDetector) {
+          scanVideoFrame();
+        }
+      } catch (error) {
+        setFormMessage(`Data tidak dapat disimpan di perangkat ini: ${error.message}`);
+      }
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !scannerScreen.hidden) {
+        closeScanner();
+      }
+    });
+    renderSavedDeposits();
+  })();
 </script>
 </body>
 </html>
