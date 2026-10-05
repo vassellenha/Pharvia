@@ -557,6 +557,78 @@ tailwind.config = {
       <p id="scanNoticeText" class="font-body-sm text-body-sm text-on-surface-variant">Izinkan kamera untuk memindai barcode. Data obat bisa dilengkapi dan dikoreksi sebelum disimpan.</p>
     </div>
 
+    <section id="recognitionResult" class="flex flex-col gap-3" aria-label="Hasil pengenalan obat" hidden>
+      <div class="flex items-center justify-between gap-2 rounded-xl bg-surface-container px-3.5 py-2.5">
+        <div class="flex min-w-0 items-center gap-2">
+          <span class="material-symbols-outlined flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-secondary text-[18px] text-white">verified</span>
+          <span id="recognitionState" class="font-label-md text-label-md font-bold text-primary">Obat terdeteksi dari gambar</span>
+        </div>
+        <span id="recognitionConfidence" class="shrink-0 rounded-full bg-secondary-container/60 px-2.5 py-1 font-label-sm text-label-sm font-bold text-on-secondary-container"></span>
+      </div>
+
+      <div class="flex flex-col gap-3 rounded-2xl bg-surface-container-low p-3.5 shadow-sm">
+        <div class="flex items-start justify-between gap-2">
+          <div class="min-w-0">
+            <span id="medicineCategory" class="block font-label-sm text-label-sm font-bold uppercase tracking-wider text-secondary"></span>
+            <h2 id="recognizedName" class="mt-0.5 font-headline-sm text-headline-sm font-extrabold text-primary"></h2>
+            <p id="recognizedManufacturer" class="mt-0.5 font-body-sm text-body-sm text-on-surface-variant"></p>
+          </div>
+          <img id="recognizedThumbnail" class="h-14 w-14 shrink-0 rounded-xl bg-white object-cover shadow-inner" alt="Foto obat yang dikenali">
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div class="flex min-h-[68px] flex-col justify-center rounded-xl bg-white p-2.5">
+            <span class="flex items-center gap-1 font-label-sm text-label-sm font-semibold text-on-surface-variant">
+              <span class="material-symbols-outlined text-[15px] text-secondary">event</span>Kedaluwarsa (ED)
+            </span>
+            <strong id="recognizedExpiry" class="mt-0.5 font-label-md text-label-md text-on-surface"></strong>
+          </div>
+          <div class="flex min-h-[68px] flex-col justify-center rounded-xl bg-white p-2.5">
+            <span class="flex items-center gap-1 font-label-sm text-label-sm font-semibold text-on-surface-variant">
+              <span class="material-symbols-outlined text-[15px] text-secondary">medication</span>Bentuk &amp; jumlah
+            </span>
+            <strong id="recognizedContents" class="mt-0.5 font-label-md text-label-md text-on-surface"></strong>
+          </div>
+        </div>
+
+        <div>
+          <span class="font-label-sm text-label-sm font-semibold text-on-surface-variant">Konfirmasi kondisi obat:</span>
+          <div class="mt-1.5 flex gap-1.5 overflow-x-auto pb-0.5">
+            <button type="button" data-condition="Aman Disimpan" class="condition-chip shrink-0 rounded-lg bg-white px-2.5 py-1.5 font-label-sm text-label-sm text-on-surface-variant">Aman Disimpan</button>
+            <button type="button" data-condition="Mendekati ED" class="condition-chip shrink-0 rounded-lg bg-white px-2.5 py-1.5 font-label-sm text-label-sm text-on-surface-variant">Mendekati ED</button>
+            <button type="button" data-condition="Kedaluwarsa" class="condition-chip shrink-0 rounded-lg bg-white px-2.5 py-1.5 font-label-sm text-label-sm text-on-surface-variant">Kedaluwarsa</button>
+            <button type="button" data-condition="Rusak / Cair" class="condition-chip shrink-0 rounded-lg bg-white px-2.5 py-1.5 font-label-sm text-label-sm text-on-surface-variant">Rusak / Cair</button>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-2.5 rounded-xl bg-white p-3">
+          <span class="material-symbols-outlined mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-secondary-container/60 text-[18px] text-secondary">recycling</span>
+          <div>
+            <span class="font-label-sm text-label-sm font-bold text-secondary">Panduan Daur Ulang Pharvia:</span>
+            <p class="mt-0.5 font-body-sm text-body-sm leading-relaxed text-on-surface-variant">Jangan buang obat ke toilet atau tempat sampah. Serahkan kemasan dan obat ke titik pengembalian Pharvia.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between rounded-xl bg-primary-fixed/50 px-3.5 py-2.5">
+        <span class="flex items-center gap-2 font-label-md text-label-md font-semibold text-primary">
+          <span class="material-symbols-outlined text-[20px]">eco</span>Estimasi Dampak Positif
+        </span>
+        <span class="font-label-md text-label-md font-bold text-primary">+20 Green Poin</span>
+      </div>
+
+      <p id="recognitionDisclaimer" class="font-body-sm text-body-sm text-on-surface-variant"></p>
+      <p id="resultStatus" class="font-label-sm text-label-sm text-error" role="alert" hidden></p>
+      <button id="addRecognizedMedicine" type="button" class="flex h-[54px] w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-primary-container font-label-lg text-label-lg font-bold text-white shadow-[0_8px_20px_rgba(15,76,129,0.25)]">
+        <span class="material-symbols-outlined text-[20px]">add_circle</span>
+        <span>Tambahkan ke Setoran (+20 Poin)</span>
+      </button>
+      <button id="editRecognizedMedicine" type="button" class="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-surface-container font-label-lg text-label-lg font-semibold text-on-surface-variant">
+        <span class="material-symbols-outlined text-[19px]">edit_note</span>
+        <span>Edit Data Manual</span>
+      </button>
+    </section>
+
     <form id="medicineForm" class="flex flex-col gap-3" hidden>
       <div class="flex items-center gap-2 rounded-xl bg-surface-container px-3.5 py-2.5">
         <span class="material-symbols-outlined text-[20px] text-secondary">verified</span>
@@ -676,6 +748,8 @@ tailwind.config = {
     const scanNotice = document.getElementById('scanNotice');
     const medicineForm = document.getElementById('medicineForm');
     const formStatus = document.getElementById('formStatus');
+    const recognitionResult = document.getElementById('recognitionResult');
+    const resultStatus = document.getElementById('resultStatus');
     const photoInput = document.getElementById('photoInput');
     const videoConstraints = {
       audio: false,
@@ -692,8 +766,120 @@ tailwind.config = {
     let isScanningFrame = false;
     let cameraGeneration = 0;
     let permissionTimer = null;
+    let recognizedMedicine = null;
+    let lastOcrConfidence = null;
 
     const setCameraStatus = (message) => { cameraStatus.textContent = message; };
+
+    const productCatalog = [
+      {
+        pattern: /\bpanad[o0][l1]\b/i,
+        name: 'Panadol',
+        ingredient: 'Paracetamol',
+        manufacturer: 'Haleon',
+        category: 'Analgesik & Antipiretik'
+      },
+      {
+        pattern: /\b(?:paracetam[o0]l|acetaminophen)\b/i,
+        name: 'Paracetamol',
+        ingredient: 'Paracetamol',
+        category: 'Analgesik & Antipiretik'
+      },
+      {
+        pattern: /\bibuprofen\b/i,
+        name: 'Ibuprofen',
+        ingredient: 'Ibuprofen',
+        category: 'Analgesik & Antiinflamasi'
+      },
+      {
+        pattern: /\bamoxicillin\b/i,
+        name: 'Amoxicillin',
+        ingredient: 'Amoxicillin',
+        category: 'Antibiotik'
+      },
+      {
+        pattern: /\b(?:cetirizine|cetirizin)\b/i,
+        name: 'Cetirizine',
+        ingredient: 'Cetirizine',
+        category: 'Antihistamin'
+      },
+      {
+        pattern: /\bloratadine\b/i,
+        name: 'Loratadine',
+        ingredient: 'Loratadine',
+        category: 'Antihistamin'
+      },
+      {
+        pattern: /\bomeprazole\b/i,
+        name: 'Omeprazole',
+        ingredient: 'Omeprazole',
+        category: 'Obat lambung'
+      }
+    ];
+
+    const formatExpiry = (value) => {
+      if (!value) return 'Tidak terbaca — cek kemasan';
+      const date = new Date(`${value}T00:00:00`);
+      if (Number.isNaN(date.getTime())) return 'Tidak terbaca — cek kemasan';
+      return new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).format(date);
+    };
+
+    const getRecognitionSnapshot = () => ({
+      name: document.getElementById('medicineName').value.trim(),
+      strength: document.getElementById('medicineStrength').value.trim(),
+      formType: document.getElementById('medicineFormType').value.trim(),
+      ingredient: document.getElementById('medicineIngredient').value.trim(),
+      manufacturer: document.getElementById('medicineManufacturer').value.trim(),
+      expiry: document.getElementById('medicineExpiry').value,
+      quantity: document.getElementById('medicineQuantity').value.trim(),
+      depositCount: document.getElementById('medicineDepositCount').value,
+      batch: document.getElementById('medicineBatch').value.trim(),
+      condition: document.getElementById('medicineCondition').value,
+      barcode: document.getElementById('medicineBarcode').value.trim(),
+      ingredientInferred: Boolean(recognizedMedicine?.ingredientInferred),
+      manufacturerInferred: Boolean(recognizedMedicine?.manufacturerInferred),
+      category: recognizedMedicine?.category || 'Obat terdeteksi dari kemasan'
+    });
+
+    const renderRecognitionResult = (confidence = lastOcrConfidence) => {
+      const medicine = getRecognitionSnapshot();
+      recognizedMedicine = medicine;
+      const hasMedicineName = Boolean(medicine.name);
+      const productLabel = [medicine.name, medicine.strength].filter(Boolean).join(' ');
+      document.getElementById('recognitionState').textContent = hasMedicineName
+        ? `Obat terdeteksi: ${medicine.name}`
+        : 'Kemasan terdeteksi — cek nama obat';
+      document.getElementById('recognitionConfidence').textContent = confidence === null
+        ? 'Periksa kemasan'
+        : `Teks ${Math.round(confidence)}%`;
+      document.getElementById('medicineCategory').textContent = medicine.category;
+      document.getElementById('recognizedName').textContent = productLabel || 'Nama obat belum terbaca';
+      document.getElementById('recognizedManufacturer').textContent = medicine.manufacturer
+        ? `${medicine.manufacturer}${medicine.manufacturerInferred ? ' (referensi merek)' : ''}`
+        : medicine.ingredient
+        ? `Kandungan aktif${medicine.ingredientInferred ? ' (referensi produk)' : ''}: ${medicine.ingredient}`
+        : 'Produsen belum terbaca dari foto';
+      const expiryElement = document.getElementById('recognizedExpiry');
+      expiryElement.textContent = formatExpiry(medicine.expiry);
+      expiryElement.classList.toggle('text-error', Boolean(medicine.expiry && new Date(`${medicine.expiry}T00:00:00`) < new Date()));
+      expiryElement.classList.toggle('text-on-surface', !medicine.expiry || new Date(`${medicine.expiry}T00:00:00`) >= new Date());
+      document.getElementById('recognizedContents').textContent = [medicine.formType, medicine.quantity].filter(Boolean).join(' · ') || 'Belum terbaca — cek kemasan';
+      document.getElementById('recognizedThumbnail').src = photoUrl || '';
+      document.getElementById('recognizedThumbnail').classList.toggle('hidden', !photoUrl);
+      document.getElementById('recognitionDisclaimer').textContent = medicine.expiry
+        ? 'Hasil pengenalan gambar bisa keliru. Pastikan nama, ED, isi kemasan, dan kondisi sesuai obat yang akan disetor.'
+        : 'Foto sisi ini belum menampilkan tanggal kedaluwarsa. Unggah foto sisi blister/kotak yang mencantumkan EXP atau ED untuk membacanya.';
+      document.querySelectorAll('.condition-chip').forEach((button) => {
+        const active = button.dataset.condition === medicine.condition;
+        button.classList.toggle('bg-error-container', active && medicine.condition === 'Kedaluwarsa');
+        button.classList.toggle('text-on-error-container', active && medicine.condition === 'Kedaluwarsa');
+        button.classList.toggle('bg-secondary-container', active && medicine.condition !== 'Kedaluwarsa');
+        button.classList.toggle('text-on-secondary-container', active && medicine.condition !== 'Kedaluwarsa');
+        button.classList.toggle('font-bold', active);
+      });
+      recognitionResult.hidden = false;
+      resultStatus.hidden = true;
+    };
 
     const loadOcrEngine = () => {
       if (window.Tesseract) {
@@ -760,6 +946,7 @@ tailwind.config = {
     const extractMedicineDetails = (text) => {
       const lines = text.split(/\r?\n/).map((line) => line.replace(/[|_]/g, ' ').replace(/\s+/g, ' ').trim()).filter(Boolean);
       const joined = lines.join(' ');
+      const detectedProduct = productCatalog.find((product) => product.pattern.test(joined) || product.pattern.test(lines.join('')));
       const strengthMatch = joined.match(/\b\d+(?:[.,]\d+)?\s?(?:mg|mcg|µg|ug|g|ml|mL|IU|UI|%)(?:\s*\/\s*\d+(?:[.,]\d+)?\s?(?:ml|mL|g))?\b/i);
       const formPatterns = [
         ['Tablet', /\b(?:tablet|tablets|tab(?:let)?|kaplet|caplet)\b/i],
@@ -773,9 +960,11 @@ tailwind.config = {
         ['Injeksi', /\b(?:injection|injeksi)\b/i]
       ];
       const matchedForm = formPatterns.find(([, pattern]) => pattern.test(joined));
-      const manufacturerLine = lines.find((line) => /\b(?:PT\.?|CV\.?|produced by|manufactured by|manufactured for|diproduksi oleh)\b/i.test(line));
+      const manufacturerLine = lines.find((line) => /\b(?:PT\.?|CV\.?|produced by|manufactured by|manufactured for|diproduksi oleh)\b/i.test(line))
+        || lines.find((line) => /\bhaleon\b/i.test(line));
       const ingredientLine = lines.find((line) => /\b(?:komposisi|composition|active ingredients?|each (?:tablet|capsule|5 ?ml) contains?)\b/i.test(line));
       const batchLine = lines.find((line) => /\b(?:batch|lot)\s*(?:no\.?|number|#|:)?\s*[A-Z0-9-]{3,}\b/i.test(line));
+      const blisters = joined.match(/\bisi\s*[:.]?\s*(\d{1,2})\s*blister\s*@\s*(\d{1,3})\s*(tablet|tab|kaplet|kapsul)\b/i);
       const strengthLineIndex = strengthMatch
         ? lines.findIndex((line) => line.toLowerCase().includes(strengthMatch[0].toLowerCase()))
         : -1;
@@ -786,19 +975,30 @@ tailwind.config = {
           ? lines[strengthLineIndex]
           : lines.slice(Math.max(0, strengthLineIndex - 2), strengthLineIndex).reverse().find((line) => !ignoredName.test(line)))
         : lines.find((line) => /\b(?:paracetamol|acetaminophen|ibuprofen|amoxicillin|aspirin|loratadine|cetirizine|omeprazole|antacid)\b/i.test(line));
-      const quantityMatch = joined.match(/\b(?:isi|contains?|content|netto|pack(?:age)?\s*of)\s*[:.]?\s*(\d{1,3})\s*(tablet|tab|kapsul|capsule|caps|kaplet|ml|sachet|strip|pcs|pieces)?\b/i)
+      const quantityMatch = blisters || joined.match(/\b(?:isi|contains?|content|netto|pack(?:age)?\s*of)\s*[:.]?\s*(\d{1,3})\s*(tablet|tab|kapsul|capsule|caps|kaplet|ml|sachet|strip|pcs|pieces)?\b/i)
         || joined.match(/\b(\d{1,3})\s*(tablet|tabs?|kapsul|capsules?|kaplet|sachets?|strips?|pcs|pieces)\b/i);
-      const name = nameLine
+      const name = detectedProduct?.name || (nameLine
         ? stripStrength(nameLine).replace(/[^a-zA-Z0-9().+\-/ ]/g, '').trim()
-        : '';
+        : '');
       return {
         name,
+        category: detectedProduct?.category || 'Obat terdeteksi dari kemasan',
         strength: strengthMatch?.[0]?.replace(/\s+/g, ' ') || '',
         formType: matchedForm?.[0] || '',
-        ingredient: ingredientLine?.replace(/^.*?\b(?:komposisi|composition|active ingredients?|each (?:tablet|capsule|5 ?ml) contains?)\b\s*:?\s*/i, '').trim() || '',
-        manufacturer: manufacturerLine?.replace(/^(?:produced by|manufactured by|manufactured for|diproduksi oleh)\s*/i, '').trim() || '',
+        ingredient: ingredientLine?.replace(/^.*?\b(?:komposisi|composition|active ingredients?|each (?:tablet|capsule|5 ?ml) contains?)\b\s*:?\s*/i, '').trim()
+          || detectedProduct?.ingredient
+          || '',
+        ingredientInferred: !ingredientLine && Boolean(detectedProduct?.ingredient),
+        manufacturer: manufacturerLine?.replace(/^(?:produced by|manufactured by|manufactured for|diproduksi oleh)\s*/i, '').trim()
+          || detectedProduct?.manufacturer
+          || '',
+        manufacturerInferred: !manufacturerLine && Boolean(detectedProduct?.manufacturer),
         expiry: parseExpiry(text),
-        quantity: quantityMatch ? `${quantityMatch[1]}${quantityMatch[2] ? ` ${quantityMatch[2]}` : ''}` : '',
+        quantity: quantityMatch
+          ? blisters
+            ? `${blisters[1]} blister × ${blisters[2]} ${blisters[3]}`
+            : `${quantityMatch[1]}${quantityMatch[2] ? ` ${quantityMatch[2]}` : ''}`
+          : '',
         batch: batchLine?.replace(/^.*?\b(?:batch|lot)\s*(?:no\.?|number|#|:)?\s*/i, '').trim() || ''
       };
     };
@@ -807,6 +1007,7 @@ tailwind.config = {
       let worker;
       try {
         document.getElementById('ocrText').textContent = '';
+        recognitionResult.hidden = true;
         setCameraStatus('Memeriksa barcode pada foto...');
         if (await createBarcodeDetector()) {
           let image;
@@ -834,40 +1035,54 @@ tailwind.config = {
         });
         const result = await worker.recognize(file);
         const text = result.data.text.trim();
+        lastOcrConfidence = result.data.confidence;
         document.getElementById('ocrText').textContent = text || 'Tidak ada teks yang terbaca.';
         const details = extractMedicineDetails(text);
-        if (details.name) document.getElementById('medicineName').value = details.name;
-        if (details.strength) document.getElementById('medicineStrength').value = details.strength;
-        if (details.formType) document.getElementById('medicineFormType').value = details.formType;
-        if (details.ingredient) document.getElementById('medicineIngredient').value = details.ingredient;
-        if (details.manufacturer) document.getElementById('medicineManufacturer').value = details.manufacturer;
-        if (details.expiry) document.getElementById('medicineExpiry').value = details.expiry;
-        if (details.quantity) document.getElementById('medicineQuantity').value = details.quantity;
-        if (details.batch) document.getElementById('medicineBatch').value = details.batch;
+        recognizedMedicine = details;
+        document.getElementById('medicineName').value = details.name || '';
+        document.getElementById('medicineStrength').value = details.strength || '';
+        document.getElementById('medicineFormType').value = details.formType || '';
+        document.getElementById('medicineIngredient').value = details.ingredient || '';
+        document.getElementById('medicineManufacturer').value = details.manufacturer || '';
+        document.getElementById('medicineExpiry').value = details.expiry || '';
+        document.getElementById('medicineQuantity').value = details.quantity || '';
+        document.getElementById('medicineBatch').value = details.batch || '';
+        document.getElementById('medicineCondition').value = details.expiry && new Date(`${details.expiry}T00:00:00`) < new Date()
+          ? 'Kedaluwarsa'
+          : 'Aman Disimpan';
+        document.getElementById('medicineDepositCount').value = '1';
+        document.getElementById('medicineBarcode').value = document.getElementById('medicineBarcode').value || '';
 
         if (!text) {
           setCameraStatus('Teks tidak terbaca. Coba foto lebih dekat, terang, dan fokus.');
-          revealForm('Tidak ada teks yang terbaca pada foto. Masukkan data dengan melihat kemasan asli.');
+          scanNoticeText.textContent = 'Teks pada foto belum terbaca. Coba unggah foto sisi label yang lebih dekat dan jelas.';
+          renderRecognitionResult(0);
           return;
         }
         const found = [
           details.name && 'nama',
           details.strength && 'dosis',
           details.formType && 'bentuk',
-          details.ingredient && 'kandungan aktif',
+          details.ingredient && !details.ingredientInferred && 'kandungan aktif',
           details.expiry && 'kedaluwarsa',
           details.quantity && 'jumlah',
           details.manufacturer && 'produsen',
           details.batch && 'batch/lot'
         ].filter(Boolean);
-        setCameraStatus(`Teks terbaca (${Math.round(result.data.confidence)}% OCR). Periksa hasil sebelum menyimpan.`);
-        revealForm('Hasil OCR bisa keliru. Foto diproses di browser; periksa setiap kolom dan isi tanggal kedaluwarsa dari kemasan asli.');
+        const isRecognized = Boolean(details.name);
+        setCameraStatus(isRecognized
+          ? `Obat dikenali dari kemasan: ${details.name}. Periksa detail sebelum menyimpan.`
+          : 'Teks kemasan terbaca, tetapi nama obat belum dikenali.');
         scanNoticeText.textContent = found.length
-          ? `Terbaca: ${found.join(', ')}. Foto diproses di browser. Cocokkan semua nilai dengan kemasan asli.`
-          : 'Teks ditemukan, tetapi detail obat tidak dapat dikenali otomatis. Isi form dengan melihat kemasan asli.';
+          ? `Dikenali dari gambar: ${found.join(', ')}. Hasil OCR perlu dicocokkan dengan kemasan.`
+          : 'Teks kemasan terbaca, tetapi nama obat dan detailnya belum dapat dikenali.';
+        renderRecognitionResult(result.data.confidence);
+        medicineForm.hidden = true;
       } catch (error) {
         setCameraStatus(`Foto gagal dianalisis: ${error.message}`);
-        revealForm('OCR tidak tersedia saat ini. Isi detail obat dengan melihat kemasan asli.');
+        scanNoticeText.textContent = 'Gambar belum bisa dikenali. Coba foto label dengan cahaya cukup dan fokus.';
+        recognitionResult.hidden = true;
+        revealForm('Pengenalan gambar gagal. Kamu bisa mengisi data obat secara manual.');
       } finally {
         if (worker) {
           await worker.terminate();
@@ -1090,6 +1305,7 @@ tailwind.config = {
       if (mode === 'manual') {
         stopCamera();
         cameraPreview.classList.add('hidden');
+        recognitionResult.hidden = true;
         document.getElementById('viewfinder').classList.add('hidden');
         document.getElementById('choosePhoto').classList.add('hidden');
         setCameraStatus('Mode input manual aktif.');
@@ -1100,6 +1316,7 @@ tailwind.config = {
       }
       document.getElementById('viewfinder').classList.remove('hidden');
       document.getElementById('choosePhoto').classList.remove('hidden');
+      recognitionResult.hidden = true;
       medicineForm.hidden = true;
       if (mode === 'barcode') {
         modeHint.textContent = 'Arahkan barcode obat ke dalam bingkai';
@@ -1156,6 +1373,43 @@ tailwind.config = {
       button.addEventListener('click', () => setMode(button.dataset.mode));
     });
     document.getElementById('choosePhoto').addEventListener('click', () => photoInput.click());
+    document.getElementById('editRecognizedMedicine').addEventListener('click', () => {
+      medicineForm.hidden = !medicineForm.hidden;
+      if (!medicineForm.hidden) {
+        document.getElementById('editRecognizedMedicine').querySelector('span:last-child').textContent = 'Tutup Edit';
+        medicineForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        document.getElementById('medicineName').focus({ preventScroll: true });
+      } else {
+        document.getElementById('editRecognizedMedicine').querySelector('span:last-child').textContent = 'Edit Data Manual';
+      }
+    });
+
+    document.getElementById('addRecognizedMedicine').addEventListener('click', () => {
+      if (document.getElementById('medicineExpiry').value && medicineForm.reportValidity()) {
+        medicineForm.requestSubmit();
+        return;
+      }
+      medicineForm.hidden = false;
+      resultStatus.textContent = 'Tanggal kedaluwarsa belum terbaca dari foto. Unggah sisi kemasan yang menampilkan ED/EXP atau isi setelah memeriksa kemasan asli.';
+      resultStatus.hidden = false;
+      medicineForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      document.getElementById('medicineExpiry').focus({ preventScroll: true });
+    });
+
+    document.querySelectorAll('.condition-chip').forEach((button) => {
+      button.addEventListener('click', () => {
+        document.getElementById('medicineCondition').value = button.dataset.condition;
+        renderRecognitionResult();
+      });
+    });
+    medicineForm.querySelectorAll('input, select').forEach((input) => {
+      input.addEventListener('input', () => {
+        if (!recognitionResult.hidden) renderRecognitionResult();
+      });
+      input.addEventListener('change', () => {
+        if (!recognitionResult.hidden) renderRecognitionResult();
+      });
+    });
 
     photoInput.addEventListener('change', async () => {
       const file = photoInput.files?.[0];
@@ -1180,8 +1434,19 @@ tailwind.config = {
       capturedPreview.classList.remove('hidden');
       stopCamera();
       cameraPreview.classList.add('hidden');
+      document.getElementById('addRecognizedMedicine').disabled = false;
+      document.getElementById('addRecognizedMedicine').querySelector('span:last-child').textContent = 'Tambahkan ke Setoran (+20 Poin)';
+      document.getElementById('addRecognizedMedicine').querySelector('.material-symbols-outlined').textContent = 'add_circle';
       medicineForm.reset();
       document.getElementById('medicineQuantity').value = '';
+      document.getElementById('medicineExpiry').value = '';
+      document.getElementById('medicineBarcode').value = '';
+      document.getElementById('medicineDepositCount').value = '1';
+      document.getElementById('medicineCondition').value = 'Aman Disimpan';
+      document.getElementById('editRecognizedMedicine').querySelector('span:last-child').textContent = 'Edit Data Manual';
+      medicineForm.hidden = true;
+      recognitionResult.hidden = true;
+      resultStatus.hidden = true;
       setFormMessage('');
       try {
         await recognizePhoto(file);
@@ -1244,6 +1509,15 @@ tailwind.config = {
         localStorage.setItem(storageKey, JSON.stringify(deposits));
         addDepositCard(deposit);
         document.getElementById('depositCount').textContent = `Semua (${deposits.length + 1})`;
+        recognizedMedicine = deposit;
+        document.getElementById('recognitionState').textContent = 'Obat berhasil ditambahkan ke setoran';
+        document.getElementById('addRecognizedMedicine').disabled = true;
+        document.getElementById('addRecognizedMedicine').querySelector('span:last-child').textContent = 'Berhasil Ditambahkan';
+        document.getElementById('addRecognizedMedicine').querySelector('.material-symbols-outlined').textContent = 'check_circle';
+        resultStatus.textContent = `${deposit.name} berhasil disimpan di daftar setoran.`;
+        resultStatus.classList.remove('text-error');
+        resultStatus.classList.add('text-secondary');
+        resultStatus.hidden = false;
         medicineForm.reset();
         document.getElementById('medicineQuantity').value = '';
         medicineForm.hidden = true;
