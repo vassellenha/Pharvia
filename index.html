@@ -6,7 +6,9 @@
 <meta name="theme-color" content="#f6fafc">
 <title>Pharvia - Beranda</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
 <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="" defer></script>
 <script>
 tailwind.config = {
   darkMode: "class",
@@ -144,6 +146,15 @@ tailwind.config = {
   .scan-button .material-symbols-outlined { animation: scan-icon-drift 2.6s ease-in-out infinite; }
   [hidden] { display: none !important; }
   .scan-screen { height: 100dvh; }
+  #collectionMap { height: 100%; min-height: 360px; background: #eaf1f5; }
+  #collectionMap .leaflet-control-attribution { font-size: 9px; }
+  #collectionMap.map-fallback { background-color: #eaf1f5; background-image: radial-gradient(ellipse at 20% 70%, #d5efe3 0 9%, transparent 9.5%), radial-gradient(ellipse at 78% 28%, #d5efe3 0 12%, transparent 12.5%), linear-gradient(12deg, transparent 47%, #fff 47.5% 50%, #d7dee3 50.5% 52%, #fff 52.5%, transparent 53%), linear-gradient(88deg, transparent 34%, #fff 34.5% 37%, #d7dee3 37.5% 39%, #fff 39.5%, transparent 40%), linear-gradient(130deg, transparent 59%, #fff 59.5% 60%, #d7dee3 60.5% 61%, #fff 61.5%, transparent 62%); }
+  .map-fallback-pin { position: absolute; z-index: 2; display: grid; width: 42px; height: 42px; place-items: center; border: 3px solid white; border-radius: 50%; background: linear-gradient(145deg, #0f4c81, #006a61); color: white; box-shadow: 0 5px 14px rgba(15,76,129,.3); }
+  .map-fallback-user { position: absolute; z-index: 3; left: 52%; top: 62%; width: 18px; height: 18px; border: 4px solid white; border-radius: 50%; background: #168bd2; box-shadow: 0 0 0 8px rgba(22,139,210,.2); }
+  .collection-marker { display: grid; place-items: center; width: 42px; height: 42px; border: 3px solid white; border-radius: 50% 50% 50% 4px; background: linear-gradient(145deg, #0f4c81, #006a61); color: white; box-shadow: 0 5px 14px rgba(15,76,129,.3); transform: rotate(-45deg); }
+  .collection-marker span { transform: rotate(45deg); font-family: 'Material Symbols Outlined'; font-size: 22px; font-feature-settings: 'liga'; }
+  .collection-marker--selected { background: linear-gradient(145deg, #006a61, #4edea3); }
+  .user-location-marker { width: 18px; height: 18px; border: 4px solid white; border-radius: 50%; background: #168bd2; box-shadow: 0 0 0 8px rgba(22,139,210,.2), 0 2px 8px rgba(0,0,0,.22); }
   .camera-stage { min-height: 340px; height: 43dvh; max-height: 460px; }
   #viewfinder.barcode-frame { width: min(88vw, 400px); height: clamp(128px, 28dvh, 190px); }
   .barcode-frame .scan-corner { width: 2.5rem; height: 2.5rem; }
@@ -203,10 +214,10 @@ tailwind.config = {
       <img alt="Logo Pharvia" class="brand-logo w-[76px] h-[56px] object-contain shrink-0" src="assets/pharvia-logo-transparent.png">
     </div>
     <div class="flex items-center gap-space-xs shrink-0">
-      <div class="flex items-center gap-1 bg-surface-container px-2.5 py-1 rounded-full text-secondary font-label-sm text-label-sm">
+      <button data-open-locations type="button" class="flex items-center gap-1 bg-surface-container px-2.5 py-1 rounded-full text-secondary font-label-sm text-label-sm" aria-label="Cari titik pengumpulan">
         <span class="material-symbols-outlined text-[16px] text-secondary">location_on</span>
-        <span class="truncate max-w-[90px] font-semibold text-on-surface">Jaksel</span>
-      </div>
+        <span id="headerLocationLabel" class="truncate max-w-[90px] font-semibold text-on-surface">Jaksel</span>
+      </button>
       <button aria-label="Notifications" class="relative w-11 h-11 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container transition-colors" type="button">
         <span class="material-symbols-outlined text-[22px]">notifications</span>
         <span class="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-error ring-2 ring-surface-container-lowest"></span>
@@ -292,7 +303,7 @@ tailwind.config = {
       </div>
       <span class="mt-2 font-label-md text-label-md text-on-surface font-semibold leading-tight">Scan Obat</span>
     </button>
-    <button class="group flex flex-col items-center text-center p-2 rounded-xl transition-colors active:bg-surface-container" type="button">
+    <button data-open-locations class="group flex flex-col items-center text-center p-2 rounded-xl transition-colors active:bg-surface-container" type="button">
       <div class="w-14 h-14 rounded-2xl bg-surface-container-lowest shadow-sm flex items-center justify-center text-secondary group-active:scale-95 transition-transform">
         <span class="material-symbols-outlined text-[26px] text-secondary" style="font-variation-settings: 'FILL' 1;">pin_drop</span>
       </div>
@@ -547,6 +558,16 @@ tailwind.config = {
     <p class="mt-0.5 font-body-md text-body-md text-on-surface-variant">Periksa kembali obat yang ingin kamu kembalikan dengan aman.</p>
   </div>
 
+  <div id="selectedDropoffNotice" class="mx-margin mt-2 hidden items-center gap-3 rounded-2xl border border-secondary/15 bg-secondary-container/40 p-3" role="status">
+    <span class="material-symbols-outlined flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-secondary">pin_drop</span>
+    <div class="min-w-0 flex-1">
+      <span class="block font-label-sm text-label-sm font-semibold text-on-secondary-container">Titik pengembalian terpilih</span>
+      <strong id="selectedDropoffName" class="block truncate font-label-md text-label-md text-primary"></strong>
+      <span id="selectedDropoffAddress" class="block truncate font-body-sm text-body-sm text-on-surface-variant"></span>
+    </div>
+    <button data-open-locations type="button" class="shrink-0 rounded-full bg-white px-3 py-2 font-label-sm text-label-sm font-bold text-primary">Ubah</button>
+  </div>
+
   <div class="mx-margin mt-3 flex items-center justify-between gap-3 rounded-2xl bg-gradient-to-br from-primary via-primary-container to-secondary p-4 text-on-primary shadow-[0_8px_24px_rgba(15,76,129,0.14)]">
     <div class="min-w-0">
       <span class="flex items-center gap-1.5 font-label-md text-label-md font-bold text-secondary-container"><span class="material-symbols-outlined text-[17px]">inventory</span>Ringkasan Setor</span>
@@ -584,6 +605,63 @@ tailwind.config = {
         <span id="depositFooterWeight" class="inline-flex items-center gap-1.5 rounded-xl bg-surface-container px-3 py-1.5 font-label-md text-label-md font-semibold text-on-surface"><span class="material-symbols-outlined text-[17px] text-secondary">scale</span></span>
       </div>
       <button id="findReturnPoint" class="flex h-[54px] w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary via-primary-container to-secondary font-label-lg text-label-lg font-bold text-on-primary shadow-[0_8px_20px_rgba(15,76,129,0.28)]" type="button"><span>Cari Titik Pengembalian</span><span class="material-symbols-outlined text-[20px]">arrow_forward</span></button>
+    </div>
+  </div>
+</section>
+
+<section id="locationsScreen" class="flex w-full flex-col pb-24" aria-label="Titik pengumpulan" hidden>
+  <div class="relative h-[390px] w-full overflow-hidden bg-surface-container-low">
+    <div id="collectionMap" class="absolute inset-0" role="application" aria-label="Peta titik pengumpulan obat"></div>
+    <div class="pointer-events-none absolute inset-x-0 top-0 z-[500] bg-gradient-to-b from-white/40 to-transparent px-margin pb-10 pt-3">
+      <div class="pointer-events-auto flex items-center gap-2 rounded-2xl bg-white/95 p-2 shadow-lg backdrop-blur">
+        <button data-back-locations type="button" aria-label="Kembali" class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-primary hover:bg-surface-container">
+          <span class="material-symbols-outlined">arrow_back</span>
+        </button>
+        <label class="relative min-w-0 flex-1">
+          <span class="material-symbols-outlined pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-[20px] text-secondary">search</span>
+          <input id="locationSearch" type="search" autocomplete="off" placeholder="Cari apotek atau drop-box..." class="h-11 w-full rounded-xl bg-surface-container-low pl-9 pr-3 font-body-sm text-body-sm text-on-surface outline-none focus:ring-2 focus:ring-secondary/30" aria-label="Cari titik pengumpulan">
+        </label>
+      </div>
+      <div id="locationFilters" class="pointer-events-auto no-scrollbar mt-2 flex gap-2 overflow-x-auto pb-1">
+        <button type="button" data-location-filter="all" aria-pressed="true" class="location-filter shrink-0 rounded-full bg-primary px-3.5 py-2 font-label-sm text-label-sm font-bold text-white shadow">Semua Titik</button>
+        <button type="button" data-location-filter="partner" aria-pressed="false" class="location-filter shrink-0 rounded-full bg-white/95 px-3.5 py-2 font-label-sm text-label-sm font-semibold text-on-surface shadow">Mitra Pharvia</button>
+        <button type="button" data-location-filter="24h" aria-pressed="false" class="location-filter shrink-0 rounded-full bg-white/95 px-3.5 py-2 font-label-sm text-label-sm font-semibold text-on-surface shadow">Buka 24 Jam</button>
+        <button type="button" data-location-filter="nearby" aria-pressed="false" class="location-filter shrink-0 rounded-full bg-white/95 px-3.5 py-2 font-label-sm text-label-sm font-semibold text-on-surface shadow">Terdekat &lt; 2 km</button>
+      </div>
+    </div>
+    <div class="absolute right-3 top-28 z-[500] flex flex-col gap-2">
+      <button id="locateMe" type="button" aria-label="Gunakan lokasi saya" class="flex h-11 w-11 items-center justify-center rounded-full bg-white text-primary shadow-lg hover:bg-surface-container-low">
+        <span class="material-symbols-outlined">my_location</span>
+      </button>
+      <button id="mapZoomIn" type="button" aria-label="Perbesar peta" class="flex h-10 w-10 items-center justify-center rounded-full bg-white text-on-surface shadow-lg">+</button>
+      <button id="mapZoomOut" type="button" aria-label="Perkecil peta" class="flex h-10 w-10 items-center justify-center rounded-full bg-white text-on-surface shadow-lg">−</button>
+    </div>
+  </div>
+
+  <div class="relative z-10 -mt-6 min-h-[430px] rounded-t-[28px] bg-white px-margin pb-8 pt-3 shadow-[0_-8px_28px_rgba(15,76,129,0.12)]">
+    <div class="mx-auto mb-4 h-1.5 w-12 rounded-full bg-surface-variant"></div>
+    <div class="mb-4 flex items-start justify-between gap-2">
+      <div class="min-w-0">
+        <h1 class="font-headline-sm text-headline-sm font-extrabold text-on-surface">Titik Pengumpulan Terdekat</h1>
+        <p id="locationStatus" class="mt-1 font-body-sm text-body-sm text-on-surface-variant" role="status" aria-live="polite">Titik contoh Jakarta Selatan. Aktifkan lokasi untuk menghitung jarak dari Anda.</p>
+      </div>
+      <div class="flex shrink-0 items-center gap-1">
+        <span id="locationResultCount" class="rounded-full bg-secondary-container px-3 py-1.5 font-label-sm text-label-sm font-bold text-on-secondary-container"></span>
+        <button id="sortLocations" type="button" aria-label="Urutkan titik terdekat" class="flex h-9 w-9 items-center justify-center rounded-full text-primary hover:bg-surface-container">
+          <span class="material-symbols-outlined">sort</span>
+        </button>
+      </div>
+    </div>
+    <div id="selectedLocationBanner" class="mb-3 hidden items-center gap-2 rounded-xl bg-secondary-container/45 p-3" role="status">
+      <span class="material-symbols-outlined text-secondary">check_circle</span>
+      <span id="selectedLocationMessage" class="min-w-0 flex-1 font-body-sm text-body-sm text-on-secondary-container"></span>
+      <button data-open-deposit type="button" class="shrink-0 rounded-full bg-primary px-3 py-2 font-label-sm text-label-sm font-bold text-white">Lihat Setoran</button>
+    </div>
+    <div id="locationCards" class="flex flex-col gap-3"></div>
+    <p id="locationEmptyState" class="hidden rounded-2xl bg-surface-container-low p-5 text-center font-body-sm text-body-sm text-on-surface-variant">Tidak ada titik yang cocok. Coba ubah kata kunci atau filter.</p>
+    <div class="mt-4 flex items-start gap-2.5 rounded-xl bg-secondary-container/45 p-3 text-on-secondary-container">
+      <span class="material-symbols-outlined mt-0.5">eco</span>
+      <p class="font-body-sm text-body-sm">Titik dan kapasitas di layar ini masih contoh. Pastikan alamat dan jam operasional sebelum berkunjung. Pengembalian obat kedaluwarsa mendukung program reboisasi mangrove.</p>
     </div>
   </div>
 </section>
@@ -879,7 +957,22 @@ tailwind.config = {
     const homeScreen = document.getElementById('homeScreen');
     const scannerScreen = document.getElementById('scannerScreen');
     const depositScreen = document.getElementById('depositScreen');
+    const locationsScreen = document.getElementById('locationsScreen');
     let activePage = 'home';
+    let previousPage = 'home';
+    const locationStorageKey = 'pharvia.selectedDropoff';
+    const collectionPoints = [
+      { id: 'sehat-farma', name: 'Apotek Sehat Farma', address: 'Jl. Gandaria Tengah II No. 14, Kebayoran Baru, Jakarta Selatan', lat: -6.2442, lng: 106.7867, distance: 1.2, partner: true, open24h: false, hours: 'Buka sampai 21.00 WIB', capacity: 62, capacityText: 'Cukup untuk sekitar 45 kemasan', types: ['Tablet', 'Kapsul', 'Sirup', 'Salep'], icon: 'local_pharmacy' },
+      { id: 'kimia-farma-gandaria', name: 'Apotek Kimia Farma Gandaria', address: 'Jl. Gandaria I No. 89, Jakarta Selatan', lat: -6.2430, lng: 106.7892, distance: 2.4, partner: true, open24h: true, hours: 'Buka 24 jam', capacity: 90, capacityText: 'Kapasitas siap pakai', types: ['Tablet', 'Kapsul', 'Sirup'], icon: 'local_pharmacy' },
+      { id: 'dropbox-gandaria', name: 'Drop-Box Pharvia Gandaria City', address: 'Gandaria City, Jl. KH. Syafi’i Hadzami, Jakarta Selatan', lat: -6.2447, lng: 106.7838, distance: 1.8, partner: false, open24h: true, hours: 'Drop-box 24 jam', capacity: 85, capacityText: 'Kapasitas siap pakai', types: ['Tablet', 'Kapsul'], icon: 'inventory_2' },
+      { id: 'mitra-kebayoran', name: 'Apotek Mitra Kebayoran', address: 'Jl. Ciledug Raya No. 12, Kebayoran Lama, Jakarta Selatan', lat: -6.2377, lng: 106.7898, distance: 2.7, partner: true, open24h: false, hours: 'Buka sampai 22.00 WIB', capacity: 48, capacityText: 'Kapasitas tersedia', types: ['Tablet', 'Sirup', 'Salep'], icon: 'local_pharmacy' }
+    ];
+    let activeLocationFilter = 'all';
+    let userLocation = null;
+    let collectionMap = null;
+    let collectionMarkers = null;
+    let userLocationMarker = null;
+    let sortByDistance = false;
     const cameraPreview = document.getElementById('cameraPreview');
     const capturedPreview = document.getElementById('capturedPreview');
     const cameraStatus = document.getElementById('cameraStatus');
@@ -1418,10 +1511,171 @@ tailwind.config = {
       }
     };
 
+    const pointDistance = (point) => {
+      if (!userLocation) return point.distance;
+      const radians = (degrees) => degrees * Math.PI / 180;
+      const latitudeDelta = radians(point.lat - userLocation.lat);
+      const longitudeDelta = radians(point.lng - userLocation.lng);
+      const arc = Math.sin(latitudeDelta / 2) ** 2
+        + Math.cos(radians(userLocation.lat)) * Math.cos(radians(point.lat))
+        * Math.sin(longitudeDelta / 2) ** 2;
+      return 6371 * 2 * Math.atan2(Math.sqrt(arc), Math.sqrt(1 - arc));
+    };
+
+    const getVisibleCollectionPoints = () => {
+      const query = document.getElementById('locationSearch').value.trim().toLocaleLowerCase('id-ID');
+      let points = collectionPoints.filter((point) => {
+        const matchesQuery = `${point.name} ${point.address}`.toLocaleLowerCase('id-ID').includes(query);
+        const distance = pointDistance(point);
+        const matchesFilter = activeLocationFilter === 'all'
+          || (activeLocationFilter === 'partner' && point.partner)
+          || (activeLocationFilter === '24h' && point.open24h)
+          || (activeLocationFilter === 'nearby' && distance <= 2);
+        return matchesQuery && matchesFilter;
+      });
+      if (sortByDistance) points = points.sort((first, second) => pointDistance(first) - pointDistance(second));
+      return points;
+    };
+
+    const makeCollectionMarker = (point) => {
+      const selectedId = localStorage.getItem(locationStorageKey);
+      const markerIcon = window.L.divIcon({
+        className: '',
+        html: `<div class="collection-marker${selectedId === point.id ? ' collection-marker--selected' : ''}"><span>${point.icon === 'inventory_2' ? 'inventory_2' : 'add_business'}</span></div>`,
+        iconSize: [42, 46],
+        iconAnchor: [21, 42],
+        popupAnchor: [0, -38]
+      });
+      const marker = window.L.marker([point.lat, point.lng], { icon: markerIcon });
+      marker.bindPopup(`<strong>${point.name}</strong><br>${pointDistance(point).toFixed(1)} km ${userLocation ? 'dari lokasi Anda' : 'perkiraan dari Kebayoran'}`);
+      marker.on('click', () => {
+        document.getElementById('locationStatus').textContent = `${point.name} · ${pointDistance(point).toFixed(1)} km`;
+        document.querySelector(`[data-focus-point="${point.id}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
+      return marker;
+    };
+
+    const focusCollectionPoint = (point) => {
+      if (collectionMap) {
+        collectionMap.flyTo([point.lat, point.lng], Math.max(collectionMap.getZoom(), 15), { duration: 0.45 });
+        collectionMarkers?.eachLayer((marker) => {
+          if (marker.getLatLng().lat === point.lat && marker.getLatLng().lng === point.lng) marker.openPopup();
+        });
+      }
+      document.getElementById('locationStatus').textContent = `${point.name} · ${pointDistance(point).toFixed(1)} km ${userLocation ? 'dari lokasi Anda' : 'perkiraan dari Kebayoran'}`;
+    };
+
+    const renderCollectionMapMarkers = (points) => {
+      const mapElement = document.getElementById('collectionMap');
+      if (collectionMarkers) {
+        collectionMarkers.clearLayers();
+        points.forEach((point) => collectionMarkers.addLayer(makeCollectionMarker(point)));
+      } else if (!window.L) {
+        mapElement.classList.add('map-fallback');
+        mapElement.innerHTML = `${points.map((point, index) => `<button type="button" class="map-fallback-pin" style="left:${18 + (index * 19) % 66}%;top:${35 + (index * 23) % 46}%" data-focus-point="${point.id}" aria-label="Tampilkan ${point.name}"><span class="material-symbols-outlined">${point.icon === 'inventory_2' ? 'inventory_2' : 'add_business'}</span></button>`).join('')}${userLocation ? '<div class="map-fallback-user" aria-label="Lokasi Anda"></div>' : ''}`;
+      }
+    };
+
+    const renderCollectionCards = () => {
+      const points = getVisibleCollectionPoints();
+      const selectedId = localStorage.getItem(locationStorageKey);
+      const selectedPoint = collectionPoints.find((point) => point.id === selectedId);
+      const selectedBanner = document.getElementById('selectedLocationBanner');
+      selectedBanner.classList.toggle('hidden', !selectedPoint);
+      selectedBanner.classList.toggle('flex', Boolean(selectedPoint));
+      if (selectedPoint) document.getElementById('selectedLocationMessage').textContent = `${selectedPoint.name} dipilih sebagai titik pengembalian.`;
+      const cards = document.getElementById('locationCards');
+      document.getElementById('locationResultCount').textContent = `${points.length} Ditemukan`;
+      document.getElementById('locationEmptyState').classList.toggle('hidden', points.length > 0);
+      cards.innerHTML = points.map((point, index) => {
+        const distance = pointDistance(point);
+        const isSelected = selectedId === point.id;
+        return `<article data-focus-point="${point.id}" tabindex="0" class="rounded-2xl ${index === 0 ? 'bg-surface-container-low' : 'bg-surface-container'} p-4 shadow-sm">
+          <div class="mb-2 flex items-center justify-between gap-2">
+            <span class="inline-flex items-center gap-1 rounded-full ${point.partner ? 'bg-tertiary-container text-white' : 'bg-secondary-container text-on-secondary-container'} px-2.5 py-1 font-label-sm text-label-sm font-semibold"><span class="material-symbols-outlined text-[15px]">${point.partner ? 'verified' : 'inventory_2'}</span>${point.partner ? 'Mitra Resmi Pharvia' : 'Drop-Box Pharvia'}</span>
+            <span class="shrink-0 font-label-sm text-label-sm font-bold ${point.open24h ? 'text-secondary' : 'text-on-surface-variant'}">${point.hours}</span>
+          </div>
+          <div class="flex items-start gap-3">
+            <span class="material-symbols-outlined flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white text-[25px] text-primary shadow-sm">${point.icon}</span>
+            <div class="min-w-0 flex-1">
+              <h2 class="font-headline-sm text-headline-sm font-bold text-primary">${point.name}</h2>
+              <p class="mt-0.5 font-body-sm text-body-sm text-on-surface-variant">${distance.toFixed(1)} km ${userLocation ? 'dari Anda' : 'perkiraan dari Kebayoran'} · ${point.address}</p>
+            </div>
+          </div>
+          <div class="my-3 rounded-xl bg-white p-3 shadow-sm">
+            <div class="mb-1.5 flex items-center justify-between gap-2"><span class="flex items-center gap-1 font-label-sm text-label-sm font-semibold text-on-surface"><span class="material-symbols-outlined text-[17px] text-secondary">inventory_2</span>Kapasitas kotak setoran</span><strong class="font-label-sm text-label-sm text-secondary">${point.capacity}% tersedia</strong></div>
+            <div class="h-2 overflow-hidden rounded-full bg-surface-variant"><div class="h-full rounded-full bg-gradient-to-r from-secondary-fixed-dim to-secondary" style="width:${point.capacity}%"></div></div>
+            <p class="mt-1.5 text-right font-body-sm text-body-sm text-on-surface-variant">${point.capacityText}</p>
+          </div>
+          <div class="mb-3 flex flex-wrap gap-1.5"><span class="w-full font-label-sm text-label-sm font-semibold text-on-surface-variant">Jenis obat diterima:</span>${point.types.map((type) => `<span class="rounded-lg bg-surface-container-highest px-2.5 py-1 font-label-sm text-label-sm text-on-surface">${type}</span>`).join('')}</div>
+          ${isSelected ? '<p class="mb-2 flex items-center gap-1 font-label-sm text-label-sm font-bold text-secondary"><span class="material-symbols-outlined text-[17px]">check_circle</span>Titik pilihanmu</p>' : ''}
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" data-route-point="${point.id}" class="flex h-11 items-center justify-center gap-1 rounded-full bg-surface-container-highest font-label-md text-label-md font-semibold text-primary"><span class="material-symbols-outlined text-[18px]">directions</span>Detail &amp; Rute</button>
+            <button type="button" data-select-point="${point.id}" class="flex h-11 items-center justify-center gap-1 rounded-full bg-primary font-label-md text-label-md font-bold text-white shadow-md"><span class="material-symbols-outlined text-[18px]">${isSelected ? 'check_circle' : 'pin_drop'}</span>${isSelected ? 'Titik Dipilih' : 'Pilih Titik Ini'}</button>
+          </div>
+        </article>`;
+      }).join('');
+      renderCollectionMapMarkers(points);
+    };
+
+    const updateSelectedDropoffNotice = () => {
+      const selectedId = localStorage.getItem(locationStorageKey);
+      const selectedPoint = collectionPoints.find((point) => point.id === selectedId);
+      const notice = document.getElementById('selectedDropoffNotice');
+      notice.classList.toggle('hidden', !selectedPoint);
+      notice.classList.toggle('flex', Boolean(selectedPoint));
+      if (!selectedPoint) return;
+      document.getElementById('selectedDropoffName').textContent = selectedPoint.name;
+      document.getElementById('selectedDropoffAddress').textContent = selectedPoint.address;
+      document.getElementById('headerLocationLabel').textContent = 'Jaksel';
+    };
+
+    const initializeCollectionMap = () => {
+      const mapElement = document.getElementById('collectionMap');
+      if (collectionMap) {
+        window.setTimeout(() => collectionMap.invalidateSize(), 100);
+        return;
+      }
+      if (!window.L) {
+        document.getElementById('mapZoomIn').hidden = true;
+        document.getElementById('mapZoomOut').hidden = true;
+        document.getElementById('locationStatus').textContent = 'Peta interaktif tidak tersedia. Daftar titik dan rute tetap bisa digunakan.';
+        renderCollectionMapMarkers(getVisibleCollectionPoints());
+        return;
+      }
+      document.getElementById('mapZoomIn').hidden = false;
+      document.getElementById('mapZoomOut').hidden = false;
+      mapElement.classList.remove('map-fallback');
+      mapElement.replaceChildren();
+      collectionMap = window.L.map(mapElement, { zoomControl: false }).setView([-6.2442, 106.7867], 14);
+      window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>'
+      }).addTo(collectionMap);
+      collectionMarkers = window.L.layerGroup().addTo(collectionMap);
+      renderCollectionMapMarkers(getVisibleCollectionPoints());
+    };
+
+    const openCollectionLocations = () => {
+      if (activePage !== 'locations') previousPage = activePage;
+      setActivePage('locations');
+      renderCollectionCards();
+      initializeCollectionMap();
+    };
+
+    const showCollectionRoute = (point) => {
+      const origin = userLocation ? `&origin=${userLocation.lat},${userLocation.lng}` : '';
+      const destination = encodeURIComponent(`${point.name}, ${point.address}`);
+      const routeUrl = `https://www.google.com/maps/dir/?api=1&destination=${destination}${origin}`;
+      window.open(routeUrl, '_blank', 'noopener,noreferrer');
+    };
+
     const setActivePage = (page) => {
       activePage = page;
       homeScreen.hidden = page !== 'home';
       depositScreen.hidden = page !== 'deposit';
+      locationsScreen.hidden = page !== 'locations';
+      updateSelectedDropoffNotice();
       document.querySelector('[data-path="beranda"]').setAttribute('aria-current', String(page === 'home'));
       document.querySelector('[data-path="setor"]').setAttribute('aria-current', String(page === 'deposit'));
       document.querySelector('[data-path="beranda"]').classList.toggle('text-primary', page === 'home');
@@ -1436,6 +1690,7 @@ tailwind.config = {
     const openScanner = () => {
       homeScreen.hidden = true;
       depositScreen.hidden = true;
+      locationsScreen.hidden = true;
       scannerScreen.hidden = false;
       document.body.style.overflow = 'hidden';
       setMode('barcode');
@@ -1451,6 +1706,7 @@ tailwind.config = {
       scannerScreen.hidden = true;
       homeScreen.hidden = activePage !== 'home';
       depositScreen.hidden = activePage !== 'deposit';
+      locationsScreen.hidden = activePage !== 'locations';
       document.body.style.overflow = '';
       document.querySelector('[data-path="scan"]').setAttribute('aria-current', 'false');
     };
@@ -1486,8 +1742,114 @@ tailwind.config = {
       renderSavedDeposits();
     });
     document.getElementById('addDepositItem').addEventListener('click', () => openScanner());
-    document.getElementById('findReturnPoint').addEventListener('click', () => {
-      window.alert('Pencarian titik pengembalian akan segera tersedia.');
+    document.getElementById('findReturnPoint').addEventListener('click', openCollectionLocations);
+    document.querySelectorAll('[data-open-locations]').forEach((control) => {
+      control.addEventListener('click', openCollectionLocations);
+    });
+    document.querySelectorAll('[data-back-locations]').forEach((control) => {
+      control.addEventListener('click', () => {
+        const returnPage = previousPage === 'locations' ? 'home' : previousPage;
+        setActivePage(returnPage);
+        if (returnPage === 'deposit') renderSavedDeposits();
+      });
+    });
+    document.getElementById('locationSearch').addEventListener('input', renderCollectionCards);
+    document.querySelectorAll('[data-location-filter]').forEach((button) => {
+      button.addEventListener('click', () => {
+        activeLocationFilter = button.dataset.locationFilter;
+        document.querySelectorAll('[data-location-filter]').forEach((filter) => {
+          const isActive = filter === button;
+          filter.setAttribute('aria-pressed', String(isActive));
+          filter.classList.toggle('bg-primary', isActive);
+          filter.classList.toggle('text-white', isActive);
+          filter.classList.toggle('font-bold', isActive);
+          filter.classList.toggle('bg-white/95', !isActive);
+          filter.classList.toggle('text-on-surface', !isActive);
+          filter.classList.toggle('font-semibold', !isActive);
+        });
+        renderCollectionCards();
+      });
+    });
+    document.getElementById('sortLocations').addEventListener('click', (event) => {
+      sortByDistance = !sortByDistance;
+      event.currentTarget.setAttribute('aria-label', sortByDistance ? 'Urutkan berdasarkan rekomendasi' : 'Urutkan titik terdekat');
+      document.getElementById('locationStatus').textContent = sortByDistance ? 'Titik diurutkan berdasarkan jarak terdekat.' : 'Urutan rekomendasi titik pengumpulan.';
+      renderCollectionCards();
+    });
+    document.getElementById('locationCards').addEventListener('click', (event) => {
+      const routeButton = event.target.closest('[data-route-point]');
+      const selectButton = event.target.closest('[data-select-point]');
+      const focusTarget = event.target.closest('[data-focus-point]');
+      const pointId = routeButton?.dataset.routePoint || selectButton?.dataset.selectPoint || focusTarget?.dataset.focusPoint;
+      const point = collectionPoints.find((candidate) => candidate.id === pointId);
+      if (!point) return;
+      if (routeButton) {
+        showCollectionRoute(point);
+        return;
+      }
+      if (selectButton) {
+        try {
+          localStorage.setItem(locationStorageKey, point.id);
+        } catch (error) {
+          document.getElementById('locationStatus').textContent = `Titik tidak bisa disimpan: ${error.message}`;
+          return;
+        }
+        document.getElementById('selectedLocationMessage').textContent = `${point.name} dipilih sebagai titik pengembalian.`;
+        document.getElementById('selectedLocationBanner').classList.remove('hidden');
+        document.getElementById('selectedLocationBanner').classList.add('flex');
+        updateSelectedDropoffNotice();
+        renderCollectionCards();
+        return;
+      }
+      focusCollectionPoint(point);
+    });
+    document.getElementById('collectionMap').addEventListener('click', (event) => {
+      const marker = event.target.closest('[data-focus-point]');
+      const point = collectionPoints.find((candidate) => candidate.id === marker?.dataset.focusPoint);
+      if (point) focusCollectionPoint(point);
+    });
+    document.getElementById('locateMe').addEventListener('click', () => {
+      if (!navigator.geolocation) {
+        document.getElementById('locationStatus').textContent = 'Lokasi tidak tersedia di browser ini.';
+        return;
+      }
+      document.getElementById('locationStatus').textContent = 'Meminta izin lokasi perangkat...';
+      navigator.geolocation.getCurrentPosition((position) => {
+        userLocation = { lat: position.coords.latitude, lng: position.coords.longitude };
+        const location = [userLocation.lat, userLocation.lng];
+        if (collectionMap) {
+          if (!userLocationMarker) {
+            userLocationMarker = window.L.marker(location, {
+              icon: window.L.divIcon({ className: '', html: '<div class="user-location-marker"></div>', iconSize: [18, 18], iconAnchor: [9, 9] })
+            }).addTo(collectionMap).bindPopup('Lokasi Anda');
+          } else {
+            userLocationMarker.setLatLng(location);
+          }
+          collectionMap.flyTo(location, 15, { duration: 0.6 });
+        } else {
+          const fallbackMap = document.getElementById('collectionMap');
+          let fallbackLocation = fallbackMap.querySelector('.map-fallback-user');
+          if (!fallbackLocation) {
+            fallbackLocation = document.createElement('div');
+            fallbackLocation.className = 'map-fallback-user';
+            fallbackLocation.setAttribute('aria-label', 'Lokasi Anda');
+            fallbackMap.append(fallbackLocation);
+          }
+        }
+        document.getElementById('locationStatus').textContent = 'Lokasi diperbarui. Jarak dan urutan titik menyesuaikan posisi Anda.';
+        renderCollectionCards();
+      }, (error) => {
+        const reason = error.code === error.PERMISSION_DENIED
+          ? 'Izin lokasi ditolak. Aktifkan izin lokasi atau gunakan daftar titik.'
+          : 'Lokasi perangkat tidak bisa didapatkan saat ini.';
+        document.getElementById('locationStatus').textContent = reason;
+      }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 });
+    });
+    document.getElementById('mapZoomIn').addEventListener('click', () => {
+      if (collectionMap) collectionMap.zoomIn();
+    });
+    document.getElementById('mapZoomOut').addEventListener('click', () => {
+      if (collectionMap) collectionMap.zoomOut();
     });
 
     const closeDepositEditor = () => {
