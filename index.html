@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Pharvia - Beranda</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "inverse-surface": "#2c3133",
+        "on-secondary-container": "#006f66",
+        "primary-fixed": "#d2e4ff",
+        "surface-variant": "#dfe3e5",
+        "outline-variant": "#c2c7d1",
+        "on-primary-fixed-variant": "#07497d",
+        "on-surface": "#171c1e",
+        "on-surface-variant": "#42474f",
+        "surface-container-low": "#f0f4f6",
+        "on-primary-fixed": "#001c37",
+        "error": "#ba1a1a",
+        "secondary": "#006a61",
+        "primary-container": "#0f4c81",
+        "tertiary-fixed-dim": "#4edea3",
+        "secondary-fixed-dim": "#6bd8cb",
+        "error-container": "#ffdad6",
+        "primary": "#00355f",
+        "surface-container-highest": "#dfe3e5",
+        "tertiary-container": "#005539",
+        "surface-container": "#eaeef0",
+        "secondary-container": "#86f2e4",
+        "inverse-on-surface": "#edf1f3",
+        "outline": "#727780",
+        "surface-container-lowest": "#ffffff",
+        "surface-bright": "#f6fafc",
+        "on-primary": "#ffffff",
+        "surface": "#f6fafc",
+        "surface-container-high": "#e5e9eb",
+        "primary-fixed-dim": "#a0c9ff",
+        "inverse-primary": "#a0c9ff",
+        "secondary-fixed": "#89f5e7",
+        "on-error-container": "#93000a",
+        "tertiary": "#003c27",
+        "surface-dim": "#d6dbdd",
+        "on-tertiary-fixed": "#002113",
+        "on-secondary": "#ffffff",
+        "on-secondary-fixed": "#00201d",
+        "surface-tint": "#2d6197",
+        "on-secondary-fixed-variant": "#005049",
+        "on-tertiary-fixed-variant": "#005236",
+        "tertiary-fixed": "#6ffbbe",
+        "on-tertiary-container": "#3dd197",
+        "on-primary-container": "#8ebdf9",
+        "on-background": "#171c1e",
+        "background": "#f6fafc",
+        "on-tertiary": "#ffffff",
+        "on-error": "#ffffff"
+      },
+      borderRadius: { DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px" },
+      spacing: {
+        "margin-lg": "2rem", "space-lg": "1.5rem", "space-xl": "2.25rem", "margin": "1.25rem",
+        "space-md": "1rem", "gutter-lg": "1.5rem", "space-sm": "0.5rem", "margin-sm": "1rem",
+        "space-xs": "0.25rem", "gutter-sm": "0.75rem", "gutter": "1rem"
+      },
+      fontFamily: {
+        "label-lg": ["Plus Jakarta Sans"], "headline-lg-mobile": ["Plus Jakarta Sans"], "body-lg": ["Plus Jakarta Sans"],
+        "body-sm": ["Plus Jakarta Sans"], "headline-sm": ["Plus Jakarta Sans"], "label-md": ["Plus Jakarta Sans"],
+        "body-md": ["Plus Jakarta Sans"], "headline-xl-mobile": ["Plus Jakarta Sans"], "headline-md": ["Plus Jakarta Sans"],
+        "headline-xl": ["Plus Jakarta Sans"], "headline-lg": ["Plus Jakarta Sans"], "label-sm": ["Plus Jakarta Sans"]
+      },
+      fontSize: {
+        "label-lg": ["15px", { lineHeight: "20px", letterSpacing: "0.01em", fontWeight: "600" }],
+        "headline-lg-mobile": ["24px", { lineHeight: "32px", letterSpacing: "-0.015em", fontWeight: "700" }],
+        "body-lg": ["16px", { lineHeight: "24px", letterSpacing: "-0.005em", fontWeight: "400" }],
+        "body-sm": ["12px", { lineHeight: "16px", letterSpacing: "0.005em", fontWeight: "400" }],
+        "headline-sm": ["18px", { lineHeight: "24px", letterSpacing: "-0.005em", fontWeight: "600" }],
+        "label-md": ["13px", { lineHeight: "18px", letterSpacing: "0.015em", fontWeight: "600" }],
+        "body-md": ["14px", { lineHeight: "20px", letterSpacing: "0em", fontWeight: "400" }],
+        "headline-xl-mobile": ["30px", { lineHeight: "38px", letterSpacing: "-0.025em", fontWeight: "800" }],
+        "headline-md": ["20px", { lineHeight: "28px", letterSpacing: "-0.01em", fontWeight: "600" }],
+        "headline-xl": ["40px", { lineHeight: "48px", letterSpacing: "-0.03em", fontWeight: "800" }],
+        "headline-lg": ["32px", { lineHeight: "40px", letterSpacing: "-0.02em", fontWeight: "700" }],
+        "label-sm": ["11px", { lineHeight: "14px", letterSpacing: "0.04em", fontWeight: "700" }]
+      }
+    }
+  }
+};
+</script>
+<style>
+  :root {
+    --photo-leaf: #4edea3;
+    --photo-sea: #0f4c81;
+    --photo-amber: #c98a2e;
+  }
+  html, body { width: 100%; margin: 0; padding: 0; background-color: #f6fafc; }
+  body { overscroll-behavior-y: none; -webkit-tap-highlight-color: transparent; min-height: max(884px, 100dvh); max-width: 480px; margin-inline: auto; box-shadow: 0 0 40px rgba(0,0,0,0.08); }
+  .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
+  main > :first-child { margin-top: 0 !important; }
+  ::-webkit-scrollbar { display: none; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  .photo-card { background-size: cover; background-position: center; }
+  .brand-logo { mix-blend-mode: multiply; }
+  @keyframes rise-in {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes scan-glow {
+    0%, 100% { box-shadow: 0 8px 24px rgba(13,148,136,0.35), 0 2px 8px rgba(15,76,129,0.18); }
+    50% { box-shadow: 0 10px 30px rgba(13,148,136,0.48), 0 2px 8px rgba(15,76,129,0.2); }
+  }
+  @keyframes scan-icon-drift {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-2px); }
+  }
+  main > div > section { animation: rise-in 650ms both; }
+  main > div > section:nth-child(2) { animation-delay: 70ms; }
+  main > div > section:nth-child(3) { animation-delay: 130ms; }
+  main > div > section:nth-child(4) { animation-delay: 190ms; }
+  main > div > section:nth-child(5) { animation-delay: 250ms; }
+  main > div > section:nth-child(6) { animation-delay: 310ms; }
+  main > div > section:nth-child(7) { animation-delay: 370ms; }
+  main > div > section:nth-child(8) { animation-delay: 430ms; }
+  button, a, article {
+    transition: transform 240ms cubic-bezier(0.2, 0.75, 0.25, 1), box-shadow 240ms ease, background-color 180ms ease, color 180ms ease, filter 240ms ease;
+  }
+  .photo-card img { transition: transform 450ms cubic-bezier(0.2, 0.75, 0.25, 1), filter 350ms ease; }
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    button:hover, main a:hover { transform: translateY(-2px); filter: brightness(1.04); }
+    button:hover { box-shadow: 0 8px 18px rgba(15,76,129,0.12); }
+    nav a:hover { transform: translateY(-3px); color: #00355f; }
+    article:hover { transform: translateY(-5px); box-shadow: 0 14px 28px rgba(15,76,129,0.14); }
+    article:hover .photo-card img { transform: scale(1.06); filter: saturate(1.08); }
+    .scan-button:hover { transform: translateY(-4px) scale(1.04); }
+  }
+  button:active, a:active { transform: scale(0.97); }
+  .scan-button { animation: scan-glow 2.6s ease-in-out infinite; }
+  .scan-button .material-symbols-outlined { animation: scan-icon-drift 2.6s ease-in-out infinite; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+  }
+  .material-symbols-outlined {
+    font-family: 'Material Symbols Outlined';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+  }
+  header, nav { max-width: 480px; margin-inline: auto; }
+</style>
+</head>
+<body class="bg-surface text-on-surface font-body-md text-body-md flex flex-col min-h-screen antialiased">
+<header class="fixed top-0 w-full z-50 pt-safe bg-surface-container-lowest/85 backdrop-blur-xl shadow-[0_1px_8px_rgba(15,76,129,0.04)]">
+  <div class="h-16 px-margin flex items-center justify-between gap-space-sm">
+    <div class="flex items-center gap-space-sm min-w-0">
+      <img alt="Logo Pharvia" class="brand-logo w-[76px] h-[56px] object-contain shrink-0" src="assets/pharvia-logo.png">
+    </div>
+    <div class="flex items-center gap-space-xs shrink-0">
+      <div class="flex items-center gap-1 bg-surface-container px-2.5 py-1 rounded-full text-secondary font-label-sm text-label-sm">
+        <span class="material-symbols-outlined text-[16px] text-secondary">location_on</span>
+        <span class="truncate max-w-[90px] font-semibold text-on-surface">Jaksel</span>
+      </div>
+      <button aria-label="Notifications" class="relative w-11 h-11 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container transition-colors" type="button">
+        <span class="material-symbols-outlined text-[22px]">notifications</span>
+        <span class="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-error ring-2 ring-surface-container-lowest"></span>
+      </button>
+      <button aria-label="Open User Profile" class="w-11 h-11 p-1 rounded-full flex items-center justify-center hover:opacity-90 transition-opacity" type="button">
+        <img alt="Foto profil Pablo" class="w-9 h-9 rounded-full object-cover object-center ring-2 ring-surface-container-lowest shadow-[0_2px_8px_rgba(15,76,129,0.2)]" src="assets/profile-photo.jpg">
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="flex flex-col relative w-full pt-16 pb-28 bg-surface min-h-screen">
+<div class="flex flex-col w-full">
+
+<section class="px-margin pt-space-md pb-space-sm flex items-center justify-between">
+  <div class="flex flex-col min-w-0 pr-space-sm">
+  <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary tracking-tight truncate">Halo, Pablo</h1>
+    <p class="font-body-md text-body-md text-on-surface-variant truncate mt-0.5">Ayo kelola obat yang sudah tidak kamu gunakan.</p>
+  </div>
+  <div class="flex items-center gap-space-xs shrink-0">
+    <div class="h-10 px-3 rounded-full bg-secondary-container/40 flex items-center gap-1.5 text-on-secondary-container shadow-sm">
+      <span class="material-symbols-outlined text-[18px] text-secondary" style="font-variation-settings: 'FILL' 1;">eco</span>
+      <span class="font-label-md text-label-md font-bold text-secondary">Level 2</span>
+    </div>
+  </div>
+</section>
+
+<section class="px-margin py-space-sm">
+  <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary-container via-primary to-secondary p-space-lg text-on-primary shadow-xl">
+    <div class="absolute -right-8 -top-8 w-44 h-44 rounded-full bg-secondary-container/15 blur-2xl pointer-events-none"></div>
+    <div class="absolute -left-6 -bottom-6 w-32 h-32 rounded-full bg-primary-fixed-dim/20 blur-xl pointer-events-none"></div>
+    <div class="relative z-10 flex flex-col">
+      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-lowest/15 backdrop-blur-md self-start">
+        <span class="material-symbols-outlined text-[16px] text-secondary-container" style="font-variation-settings: 'FILL' 1;">compost</span>
+        <span class="font-label-sm text-label-sm font-semibold tracking-wide text-secondary-container uppercase">Program Sirkular Obat</span>
+      </div>
+      <div class="mt-3.5 flex items-start justify-between gap-space-sm">
+        <div class="max-w-[210px]">
+          <h2 class="font-headline-md text-headline-md leading-tight tracking-tight text-surface-container-lowest font-bold">
+            Punya obat yang sudah tidak terpakai?
+          </h2>
+          <p class="font-body-md text-body-md text-primary-fixed leading-snug mt-1.5 opacity-90">
+            Kembalikan dengan aman melalui titik Pharvia terdekat.
+          </p>
+        </div>
+        <div class="w-24 h-24 shrink-0 rounded-xl bg-surface-container-lowest/10 backdrop-blur-md p-2 flex items-center justify-center relative shadow-inner">
+          <svg class="w-20 h-20" fill="none" viewBox="0 0 88 88" xmlns="http://www.w3.org/2000/svg">
+            <rect fill="#EAEFF0" fill-opacity="0.95" height="54" rx="10" width="38" x="18" y="16"></rect>
+            <rect fill="#86F2E4" height="12" rx="6" width="12" x="23" y="22"></rect>
+            <rect fill="#0F4C81" height="12" rx="6" width="12" x="39" y="22"></rect>
+            <rect fill="#006A61" height="12" rx="6" width="12" x="23" y="38"></rect>
+            <rect fill="#86F2E4" height="12" rx="6" width="12" x="39" y="38"></rect>
+            <rect fill="#A0C9FF" height="12" rx="6" width="12" x="23" y="54"></rect>
+            <rect fill="#005539" height="12" rx="6" width="12" x="39" y="54"></rect>
+            <path d="M42 56C42 38 68 28 68 28C68 28 72 52 54 64C48.5 67.5 42 66 42 56Z" fill="#4EDEA3"></path>
+            <path d="M48 52C54 44 64 34 64 34" stroke="#003C27" stroke-linecap="round" stroke-width="2.5"></path>
+          </svg>
+        </div>
+      </div>
+      <div class="mt-space-lg flex items-center justify-between gap-space-sm pt-2">
+        <button class="h-[46px] px-6 rounded-full bg-secondary-container text-on-secondary-container font-label-lg text-label-lg font-bold flex items-center gap-2 active:scale-95 transition-transform shadow-md" type="button">
+          <span>Setor Obat</span>
+          <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+        </button>
+        <a class="font-label-md text-label-md text-surface-container-lowest font-medium hover:underline inline-flex items-center gap-1 opacity-90" href="#">
+          <span>Pelajari Caranya</span>
+          <span class="material-symbols-outlined text-[16px]">north_east</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="px-margin pt-space-md">
+  <div class="flex items-center justify-between mb-space-sm">
+    <h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">Akses Cepat</h3>
+    <span class="font-label-sm text-label-sm text-secondary font-semibold uppercase tracking-wider">Layanan Mandiri</span>
+  </div>
+  <div class="grid grid-cols-4 gap-gutter-sm">
+    <button class="group flex flex-col items-center text-center p-2 rounded-xl transition-colors active:bg-surface-container" type="button">
+      <div class="w-14 h-14 rounded-2xl bg-surface-container-lowest shadow-sm flex items-center justify-center text-primary group-active:scale-95 transition-transform">
+        <span class="material-symbols-outlined text-[26px] text-primary" style="font-variation-settings: 'FILL' 1;">qr_code_scanner</span>
+      </div>
+      <span class="mt-2 font-label-md text-label-md text-on-surface font-semibold leading-tight">Scan Obat</span>
+    </button>
+    <button class="group flex flex-col items-center text-center p-2 rounded-xl transition-colors active:bg-surface-container" type="button">
+      <div class="w-14 h-14 rounded-2xl bg-surface-container-lowest shadow-sm flex items-center justify-center text-secondary group-active:scale-95 transition-transform">
+        <span class="material-symbols-outlined text-[26px] text-secondary" style="font-variation-settings: 'FILL' 1;">pin_drop</span>
+      </div>
+      <span class="mt-2 font-label-md text-label-md text-on-surface font-semibold leading-tight">Cari Titik</span>
+    </button>
+    <button class="group flex flex-col items-center text-center p-2 rounded-xl transition-colors active:bg-surface-container" type="button">
+      <div class="w-14 h-14 rounded-2xl bg-surface-container-lowest shadow-sm flex items-center justify-center text-primary-container group-active:scale-95 transition-transform">
+        <span class="material-symbols-outlined text-[26px] text-primary-container" style="font-variation-settings: 'FILL' 1;">receipt_long</span>
+      </div>
+      <span class="mt-2 font-label-md text-label-md text-on-surface font-semibold leading-tight">Riwayat</span>
+    </button>
+    <button class="group flex flex-col items-center text-center p-2 rounded-xl transition-colors active:bg-surface-container" type="button">
+      <div class="w-14 h-14 rounded-2xl bg-surface-container-lowest shadow-sm flex items-center justify-center text-tertiary-container group-active:scale-95 transition-transform">
+        <span class="material-symbols-outlined text-[26px] text-tertiary-container" style="font-variation-settings: 'FILL' 1;">menu_book</span>
+      </div>
+      <span class="mt-2 font-label-md text-label-md text-on-surface font-semibold leading-tight">Edukasi</span>
+    </button>
+  </div>
+</section>
+
+<section class="px-margin pt-space-lg">
+  <div class="flex items-center justify-between mb-space-sm">
+    <div class="flex items-center gap-2">
+      <h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">Setoran Aktif</h3>
+      <span class="w-2.5 h-2.5 rounded-full bg-secondary animate-pulse"></span>
+    </div>
+    <a class="font-label-md text-label-md text-secondary font-semibold hover:underline" href="#">Semua (1)</a>
+  </div>
+  <div class="w-full bg-surface-container-lowest rounded-2xl p-space-md shadow-sm">
+    <div class="flex items-center justify-between gap-2 pb-space-sm">
+      <div class="flex items-center gap-2">
+        <div class="w-7 h-7 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+          <span class="material-symbols-outlined text-[16px]">package_2</span>
+        </div>
+        <span class="font-label-md text-label-md font-bold tracking-tight text-primary">PHV-10293</span>
+      </div>
+      <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-secondary-container/40 text-on-secondary-container font-label-sm text-label-sm font-semibold">
+        Menunggu diserahkan
+      </span>
+    </div>
+    <div class="flex items-start gap-2.5 my-space-xs p-2.5 rounded-xl bg-surface-container-low">
+      <span class="material-symbols-outlined text-[20px] text-secondary mt-0.5">local_pharmacy</span>
+      <div class="flex flex-col min-w-0">
+        <span class="font-label-sm text-label-sm text-on-surface-variant">Titik Pengembalian Drop-off</span>
+        <span class="font-body-md text-body-md font-semibold text-on-surface truncate">Apotek Kimia Farma Cikarang</span>
+        <span class="font-body-sm text-body-sm text-outline">Berlaku s/d Besok, 20:00 WIB</span>
+      </div>
+    </div>
+    <div class="mt-space-md pt-space-xs px-1">
+      <div class="relative flex items-center justify-between">
+        <div class="absolute left-3 right-3 top-3.5 h-[3px] bg-surface-container"></div>
+        <div class="absolute left-3 w-1/2 top-3.5 h-[3px] bg-secondary"></div>
+        <div class="relative z-10 flex flex-col items-center">
+          <div class="w-7 h-7 rounded-full bg-secondary text-on-secondary flex items-center justify-center shadow-sm">
+            <span class="material-symbols-outlined text-[16px] font-bold">check</span>
+          </div>
+          <span class="font-label-sm text-label-sm font-bold text-secondary mt-1.5">Terdaftar</span>
+        </div>
+        <div class="relative z-10 flex flex-col items-center">
+          <div class="w-7 h-7 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center ring-4 ring-secondary-container/30">
+            <span class="w-2.5 h-2.5 rounded-full bg-secondary animate-ping"></span>
+          </div>
+          <span class="font-label-sm text-label-sm font-bold text-on-surface mt-1.5">Diterima</span>
+        </div>
+        <div class="relative z-10 flex flex-col items-center">
+          <div class="w-7 h-7 rounded-full bg-surface-container text-outline flex items-center justify-center">
+            <span class="w-2 h-2 rounded-full bg-outline"></span>
+          </div>
+          <span class="font-label-sm text-label-sm font-medium text-outline mt-1.5">Diproses</span>
+        </div>
+      </div>
+    </div>
+    <div class="mt-space-md pt-space-sm flex items-center justify-between">
+      <span class="font-body-sm text-body-sm text-on-surface-variant">4 item strip &amp; sirup</span>
+      <button class="h-9 px-4 rounded-full bg-surface-container-high text-primary font-label-md text-label-md font-bold flex items-center gap-1 hover:bg-surface-container active:scale-95 transition-all" type="button">
+        <span>Lihat Detail</span>
+        <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<section class="px-margin pt-space-lg">
+  <div class="flex items-center justify-between mb-space-sm">
+    <h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">Dampak Kamu</h3>
+    <span class="font-label-sm text-label-sm text-secondary font-semibold">Tahun Ini</span>
+  </div>
+  <div class="relative overflow-hidden w-full bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm">
+    <div class="absolute -right-12 -bottom-12 w-48 h-48 rounded-full bg-secondary-fixed/30 blur-2xl pointer-events-none"></div>
+    <div class="relative z-10 flex items-center justify-between gap-space-md">
+      <div class="flex flex-col">
+        <div class="flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[18px] text-secondary" style="font-variation-settings: 'FILL' 1;">volunteer_activism</span>
+          <span class="font-label-sm text-label-sm font-bold text-secondary uppercase tracking-wider">Kontribusi Nyata</span>
+        </div>
+        <span class="font-headline-xl-mobile text-headline-xl-mobile font-extrabold text-primary mt-1 tracking-tight">32 <span class="font-headline-sm text-headline-sm font-semibold text-on-surface-variant">Obat</span></span>
+        <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Telah aman dari pencemaran tanah &amp; air.</p>
+      </div>
+      <div class="relative w-20 h-20 shrink-0 flex items-center justify-center">
+        <svg class="w-full h-full -rotate-90" viewBox="0 0 72 72">
+          <circle cx="36" cy="36" fill="none" r="30" stroke="#EAEEF0" stroke-width="7"></circle>
+          <circle cx="36" cy="36" fill="none" r="30" stroke="#006A61" stroke-dasharray="188.4" stroke-dashoffset="52.75" stroke-linecap="round" stroke-width="7"></circle>
+        </svg>
+        <div class="absolute flex flex-col items-center justify-center text-center">
+          <span class="font-label-lg text-label-lg font-extrabold text-secondary leading-none">72%</span>
+          <span class="text-[9px] uppercase tracking-tighter text-outline font-bold mt-0.5">Target</span>
+        </div>
+      </div>
+    </div>
+    <div class="mt-space-md grid grid-cols-2 gap-gutter-sm">
+      <div class="p-3 rounded-xl bg-surface-container-low flex flex-col">
+        <div class="flex items-center gap-1 text-on-surface-variant">
+          <span class="material-symbols-outlined text-[16px] text-secondary">recycling</span>
+          <span class="font-label-sm text-label-sm">Limbah Terkelola</span>
+        </div>
+        <span class="font-headline-sm text-headline-sm font-extrabold text-primary mt-1">3,6 <span class="font-body-sm text-body-sm font-medium text-outline">kg</span></span>
+      </div>
+      <div class="p-3 rounded-xl bg-surface-container-low flex flex-col">
+        <div class="flex items-center gap-1 text-on-surface-variant">
+          <span class="material-symbols-outlined text-[16px] text-secondary-container" style="font-variation-settings: 'FILL' 1;">stars</span>
+          <span class="font-label-sm text-label-sm">Pharvia Points</span>
+        </div>
+        <span class="font-headline-sm text-headline-sm font-extrabold text-primary mt-1">720 <span class="font-body-sm text-body-sm font-medium text-outline">pts</span></span>
+      </div>
+    </div>
+    <div class="mt-space-md pt-space-xs flex justify-end">
+      <a class="inline-flex items-center gap-1 font-label-md text-label-md text-secondary font-bold hover:underline" href="#">
+        <span>Lihat Dampak Lengkap</span>
+        <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="pt-space-lg pb-space-md">
+  <div class="px-margin flex items-center justify-between mb-space-sm">
+    <div class="flex flex-col">
+      <h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">Kenali Obatmu</h3>
+      <p class="font-body-sm text-body-sm text-on-surface-variant">Panduan aman konsumsi &amp; daur ulang</p>
+    </div>
+    <a class="font-label-md text-label-md text-secondary font-semibold hover:underline" href="#">Lihat Semua</a>
+  </div>
+  <div class="flex overflow-x-auto gap-space-md px-margin no-scrollbar pb-2 pt-1">
+    <article class="flex-none w-[260px] bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm flex flex-col">
+      <div class="relative w-full h-32 bg-surface-container photo-card overflow-hidden">
+        <img alt="" aria-hidden="true" class="absolute inset-0 w-full h-full object-cover" src="assets/article-environment.svg">
+        <div class="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-full bg-surface-container-lowest/90 backdrop-blur-sm text-on-secondary-container font-label-sm text-label-sm font-bold flex items-center gap-1">
+          <span class="material-symbols-outlined text-[13px] text-secondary">water_drop</span>
+          <span>Lingkungan</span>
+        </div>
+      </div>
+      <div class="p-space-md flex flex-col justify-between flex-grow">
+        <div>
+          <h4 class="font-headline-sm text-headline-sm text-on-surface font-bold leading-snug line-clamp-2">
+            Kenapa obat tidak boleh dibuang ke toilet?
+          </h4>
+          <p class="font-body-sm text-body-sm text-on-surface-variant mt-1.5 line-clamp-2">
+            Zat aktif kimia dapat meresap ke dalam air tanah dan mencemari ekosistem mikroorganisme.
+          </p>
+        </div>
+        <div class="mt-space-md flex items-center justify-between pt-space-xs">
+          <span class="font-body-sm text-body-sm text-outline flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px]">schedule</span> 3 mnt baca
+          </span>
+          <span class="material-symbols-outlined text-[20px] text-secondary">bookmark_border</span>
+        </div>
+      </div>
+    </article>
+    <article class="flex-none w-[260px] bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm flex flex-col">
+      <div class="relative w-full h-32 bg-surface-container photo-card overflow-hidden">
+        <img alt="" aria-hidden="true" class="absolute inset-0 w-full h-full object-cover" src="assets/article-safety.svg">
+        <div class="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-full bg-surface-container-lowest/90 backdrop-blur-sm text-on-primary-fixed-variant font-label-sm text-label-sm font-bold flex items-center gap-1">
+          <span class="material-symbols-outlined text-[13px] text-primary">health_and_safety</span>
+          <span>Keselamatan</span>
+        </div>
+      </div>
+      <div class="p-space-md flex flex-col justify-between flex-grow">
+        <div>
+          <h4 class="font-headline-sm text-headline-sm text-on-surface font-bold leading-snug line-clamp-2">
+            Apakah obat kedaluwarsa masih aman diminum?
+          </h4>
+          <p class="font-body-sm text-body-sm text-on-surface-variant mt-1.5 line-clamp-2">
+            Penurunan efikasi zat aktif dan potensi toksisitas yang perlu diwaspadai bagi tubuh.
+          </p>
+        </div>
+        <div class="mt-space-md flex items-center justify-between pt-space-xs">
+          <span class="font-body-sm text-body-sm text-outline flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px]">schedule</span> 2 mnt baca
+          </span>
+          <span class="material-symbols-outlined text-[20px] text-secondary">bookmark_border</span>
+        </div>
+      </div>
+    </article>
+    <article class="flex-none w-[260px] bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm flex flex-col">
+      <div class="relative w-full h-32 bg-surface-container photo-card overflow-hidden">
+        <img alt="" aria-hidden="true" class="absolute inset-0 w-full h-full object-cover" src="assets/article-storage.svg">
+        <div class="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-full bg-surface-container-lowest/90 backdrop-blur-sm text-on-secondary-container font-label-sm text-label-sm font-bold flex items-center gap-1">
+          <span class="material-symbols-outlined text-[13px] text-secondary">inventory</span>
+          <span>Edukasi</span>
+        </div>
+      </div>
+      <div class="p-space-md flex flex-col justify-between flex-grow">
+        <div>
+          <h4 class="font-headline-sm text-headline-sm text-on-surface font-bold leading-snug line-clamp-2">
+            Bagaimana cara menyimpan sisa sirup &amp; tablet?
+          </h4>
+          <p class="font-body-sm text-body-sm text-on-surface-variant mt-1.5 line-clamp-2">
+            Kiat menjaga stabilitas obat di suhu ruangan yang tepat agar tetap aman digunakan.
+          </p>
+        </div>
+        <div class="mt-space-md flex items-center justify-between pt-space-xs">
+          <span class="font-body-sm text-body-sm text-outline flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px]">schedule</span> 4 mnt baca
+          </span>
+          <span class="material-symbols-outlined text-[20px] text-secondary">bookmark_border</span>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section class="px-margin pt-space-xs pb-space-lg">
+  <div class="p-space-md rounded-2xl bg-surface-container-low flex items-center gap-3.5">
+    <div class="w-11 h-11 rounded-full bg-secondary/10 flex items-center justify-center shrink-0 text-secondary">
+      <span class="material-symbols-outlined text-[22px]">contact_support</span>
+    </div>
+    <div class="flex flex-col min-w-0 flex-1">
+      <span class="font-label-md text-label-md font-bold text-on-surface">Butuh bantuan konsultasi obat?</span>
+      <span class="font-body-sm text-body-sm text-on-surface-variant">Apoteker berlisensi Pharvia siap mendampingimu via chat.</span>
+    </div>
+    <button class="shrink-0 h-9 px-3 rounded-full bg-surface-container-lowest text-secondary font-label-sm text-label-sm font-bold shadow-sm active:scale-95 transition-transform" type="button">
+      Tanya
+    </button>
+  </div>
+</section>
+
+</div>
+</main>
+
+<nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_-4px_20px_rgba(15,76,129,0.06)]" data-active-classes="text-primary font-bold">
+  <div class="relative flex items-center justify-between h-16 px-margin max-w-[420px] mx-auto">
+    <a aria-current="page" class="flex flex-col items-center justify-center flex-1 h-14 min-w-[56px] transition-colors text-primary font-bold" data-path="beranda" href="#">
+      <span class="material-symbols-outlined text-[24px]">home</span>
+      <span class="font-label-sm text-label-sm mt-0.5">Beranda</span>
+    </a>
+    <a class="flex flex-col items-center justify-center flex-1 h-14 min-w-[56px] text-on-surface-variant transition-colors" data-path="setor" href="#">
+      <span class="material-symbols-outlined text-[24px]">inventory_2</span>
+      <span class="font-label-sm text-label-sm mt-0.5">Setor</span>
+    </a>
+    <div class="relative flex flex-col items-center justify-center flex-1 min-w-[60px]">
+      <a aria-label="Scan Medicine or Return Package" class="scan-button absolute -top-8 w-[58px] h-[58px] rounded-full bg-gradient-to-tr from-secondary to-secondary-container flex items-center justify-center text-on-primary shadow-[0_8px_24px_rgba(13,148,136,0.35),0_2px_8px_rgba(15,76,129,0.18)] active:scale-95 transition-transform" data-path="scan" href="#">
+        <span class="material-symbols-outlined text-[30px] text-on-primary">qr_code_scanner</span>
+      </a>
+      <span class="font-label-sm text-label-sm text-on-surface-variant mt-9">Scan</span>
+    </div>
+    <a class="flex flex-col items-center justify-center flex-1 h-14 min-w-[56px] text-on-surface-variant transition-colors" data-path="aktivitas" href="#">
+      <span class="material-symbols-outlined text-[24px]">history</span>
+      <span class="font-label-sm text-label-sm mt-0.5">Aktivitas</span>
+    </a>
+    <a class="flex flex-col items-center justify-center flex-1 h-14 min-w-[56px] text-on-surface-variant transition-colors" data-path="profil" href="#">
+      <span class="material-symbols-outlined text-[24px]">person</span>
+      <span class="font-label-sm text-label-sm mt-0.5">Profil</span>
+    </a>
+  </div>
+</nav>
+<script>
+  document.querySelectorAll('button, article').forEach((element) => {
+    element.addEventListener('touchstart', () => {}, { passive: true });
+  });
+</script>
+</body>
+</html>
