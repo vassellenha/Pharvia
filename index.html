@@ -145,6 +145,8 @@ tailwind.config = {
   [hidden] { display: none !important; }
   .scan-screen { height: 100dvh; }
   .camera-stage { min-height: 340px; height: 43dvh; max-height: 460px; }
+  #viewfinder.barcode-frame { width: min(88vw, 400px); height: clamp(128px, 28dvh, 190px); }
+  .barcode-frame .scan-corner { width: 2.5rem; height: 2.5rem; }
   .scan-laser {
     animation: scan-laser-move 2.4s ease-in-out infinite;
   }
@@ -242,7 +244,7 @@ tailwind.config = {
         </div>
       </div>
       <div class="mt-space-lg flex items-center justify-between gap-space-sm pt-2">
-        <button class="h-[46px] px-6 rounded-full bg-secondary-container text-on-secondary-container font-label-lg text-label-lg font-bold flex items-center gap-2 active:scale-95 transition-transform shadow-md" type="button">
+        <button data-open-deposit class="h-[46px] px-6 rounded-full bg-secondary-container text-on-secondary-container font-label-lg text-label-lg font-bold flex items-center gap-2 active:scale-95 transition-transform shadow-md" type="button">
           <span>Setor Obat</span>
           <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
         </button>
@@ -507,6 +509,92 @@ tailwind.config = {
 
 </div>
 
+<section id="depositScreen" class="flex w-full flex-col pb-44" aria-label="Setoran saya" hidden>
+  <div class="px-margin pt-4 pb-2">
+    <div class="mb-2 flex items-center justify-between gap-space-sm">
+      <span class="inline-flex items-center gap-1.5 rounded-full bg-secondary-container/40 px-3 py-1 text-on-secondary-container">
+        <span class="material-symbols-outlined text-[16px] text-secondary">eco</span>
+        <span class="font-label-sm text-label-sm font-bold tracking-wide">Langkah 1 dari 3: Daftar Obat</span>
+      </span>
+      <div class="flex items-center gap-1" aria-label="Langkah 1 dari 3">
+        <span class="h-1.5 w-7 rounded-full bg-secondary"></span><span class="h-1.5 w-2 rounded-full bg-surface-variant"></span><span class="h-1.5 w-2 rounded-full bg-surface-variant"></span>
+      </div>
+    </div>
+    <h1 class="font-headline-lg-mobile text-headline-lg-mobile font-extrabold tracking-tight text-primary">Setoran Saya</h1>
+    <p class="mt-0.5 font-body-md text-body-md text-on-surface-variant">Periksa kembali obat yang ingin kamu kembalikan dengan aman.</p>
+  </div>
+
+  <div class="mx-margin mt-3 flex items-center justify-between gap-3 rounded-2xl bg-gradient-to-br from-primary via-primary-container to-secondary p-4 text-on-primary shadow-[0_8px_24px_rgba(15,76,129,0.14)]">
+    <div class="min-w-0">
+      <span class="flex items-center gap-1.5 font-label-md text-label-md font-bold text-secondary-container"><span class="material-symbols-outlined text-[17px]">inventory</span>Ringkasan Setor</span>
+      <strong id="depositSummaryCount" class="mt-1 block font-headline-sm text-headline-sm"></strong>
+      <span class="mt-1 block font-body-sm text-body-sm text-primary-fixed">Estimasi pengurangan jejak karbon<br><span id="depositSummaryImpact"></span></span>
+    </div>
+    <div class="shrink-0 text-right">
+      <span id="depositSummaryPoints" class="inline-flex items-center gap-1 rounded-full bg-secondary-container px-3 py-2 font-label-md text-label-md font-bold text-on-secondary-container"></span>
+      <span class="mt-1 block font-body-sm text-body-sm text-white/80">Siap diklaim</span>
+    </div>
+  </div>
+
+  <div id="depositItems" class="mx-margin mt-5 flex flex-col gap-3"></div>
+  <p id="depositPageError" class="mx-margin mt-3 rounded-xl bg-error-container p-3 font-body-sm text-body-sm text-on-error-container" role="alert" hidden></p>
+  <p id="depositEmptyState" class="mx-margin mt-5 rounded-2xl bg-surface-container-low p-5 text-center font-body-md text-body-md text-on-surface-variant" hidden>Belum ada obat di daftar setoran. Tambahkan dengan scan atau isi manual.</p>
+  <button id="addDepositItem" class="mx-margin mt-4 flex w-[calc(100%-2.5rem)] items-center justify-center gap-2 rounded-2xl bg-surface-container-low px-4 py-3.5 font-label-lg text-label-lg font-bold text-primary shadow-sm transition-colors hover:bg-surface-container" type="button">
+    <span class="material-symbols-outlined text-[20px] text-secondary">add_circle</span>
+    <span>Tambah Obat Lain (Scan / Manual)</span>
+  </button>
+  <div class="mx-margin mt-4 flex items-start gap-3 rounded-2xl bg-surface-container-low p-4 shadow-sm">
+    <span class="material-symbols-outlined mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-secondary-container text-on-secondary-container">lightbulb</span>
+    <div><strong class="font-label-md text-label-md text-primary">Tips Pengemasan Aman</strong><p class="mt-1 font-body-sm text-body-sm leading-relaxed text-on-surface-variant">Pisahkan obat dari cairan lain, tutup botol rapat, dan biarkan obat dalam blister atau kemasan aslinya.</p></div>
+  </div>
+  <div class="mx-margin mt-4 flex items-center justify-between gap-3 rounded-2xl bg-surface-container-lowest p-4 shadow-sm">
+    <div class="flex min-w-0 items-center gap-3">
+      <span class="material-symbols-outlined flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-tertiary-fixed-dim/40 text-tertiary-container">verified</span>
+      <div class="min-w-0"><strong class="block truncate font-label-md text-label-md text-primary">Daur Ulang Tersertifikasi BPOM</strong><span class="block truncate font-body-sm text-body-sm text-on-surface-variant">Bahan berbahaya dimusnahkan secara aman</span></div>
+    </div>
+    <span class="material-symbols-outlined shrink-0 text-secondary">verified</span>
+  </div>
+  <div class="fixed inset-x-0 bottom-16 z-40 bg-surface-container-lowest/95 p-4 shadow-[0_-8px_24px_rgba(15,76,129,0.08)] backdrop-blur-xl">
+    <div class="mx-auto flex max-w-[420px] flex-col gap-3">
+      <div class="flex items-center justify-between">
+        <div class="flex flex-col"><span class="font-label-sm text-label-sm text-on-surface-variant">Total Terdaftar</span><strong id="depositFooterCount" class="font-headline-sm text-headline-sm font-extrabold tracking-tight text-primary"></strong></div>
+        <span id="depositFooterWeight" class="inline-flex items-center gap-1.5 rounded-xl bg-surface-container px-3 py-1.5 font-label-md text-label-md font-semibold text-on-surface"><span class="material-symbols-outlined text-[17px] text-secondary">scale</span></span>
+      </div>
+      <button id="findReturnPoint" class="flex h-[54px] w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary via-primary-container to-secondary font-label-lg text-label-lg font-bold text-on-primary shadow-[0_8px_20px_rgba(15,76,129,0.28)]" type="button"><span>Cari Titik Pengembalian</span><span class="material-symbols-outlined text-[20px]">arrow_forward</span></button>
+    </div>
+  </div>
+</section>
+
+<div id="depositEditModal" class="fixed inset-0 z-[80] flex items-end justify-center bg-black/50 p-0 sm:items-center sm:p-4" hidden>
+  <form id="depositEditForm" class="max-h-[88dvh] w-full max-w-[480px] overflow-y-auto rounded-t-[28px] bg-surface-container-lowest p-5 shadow-2xl sm:rounded-2xl">
+    <div class="mb-4 flex items-center justify-between"><h2 id="depositEditTitle" class="font-headline-sm text-headline-sm font-bold text-primary">Edit obat</h2><button id="closeDepositEdit" type="button" aria-label="Tutup edit" class="flex h-10 w-10 items-center justify-center rounded-full bg-surface-container"><span class="material-symbols-outlined">close</span></button></div>
+    <input id="editDepositId" type="hidden">
+    <div class="flex flex-col gap-3">
+      <label class="flex flex-col gap-1 font-label-sm text-label-sm font-semibold text-on-surface-variant">Nama obat<input id="editDepositName" required maxlength="100" class="h-11 rounded-xl border border-outline-variant/60 bg-white px-3 font-body-md text-on-surface outline-none focus:border-secondary"></label>
+      <label class="flex flex-col gap-1 font-label-sm text-label-sm font-semibold text-on-surface-variant">Nomor barcode<input id="editDepositBarcode" maxlength="120" class="h-11 rounded-xl border border-outline-variant/60 bg-white px-3 font-body-sm text-on-surface outline-none focus:border-secondary"></label>
+      <div class="grid grid-cols-2 gap-3">
+        <label class="flex flex-col gap-1 font-label-sm text-label-sm font-semibold text-on-surface-variant">Dosis<input id="editDepositStrength" maxlength="80" class="h-11 rounded-xl border border-outline-variant/60 bg-white px-3 font-body-sm text-on-surface outline-none focus:border-secondary"></label>
+        <label class="flex flex-col gap-1 font-label-sm text-label-sm font-semibold text-on-surface-variant">Bentuk<input id="editDepositFormType" maxlength="80" class="h-11 rounded-xl border border-outline-variant/60 bg-white px-3 font-body-sm text-on-surface outline-none focus:border-secondary"></label>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <label class="flex flex-col gap-1 font-label-sm text-label-sm font-semibold text-on-surface-variant">Kandungan aktif<input id="editDepositIngredient" maxlength="160" class="h-11 rounded-xl border border-outline-variant/60 bg-white px-3 font-body-sm text-on-surface outline-none focus:border-secondary"></label>
+        <label class="flex flex-col gap-1 font-label-sm text-label-sm font-semibold text-on-surface-variant">Produsen<input id="editDepositManufacturer" maxlength="120" class="h-11 rounded-xl border border-outline-variant/60 bg-white px-3 font-body-sm text-on-surface outline-none focus:border-secondary"></label>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <label class="flex flex-col gap-1 font-label-sm text-label-sm font-semibold text-on-surface-variant">Kedaluwarsa<input id="editDepositExpiry" type="date" required class="h-11 rounded-xl border border-outline-variant/60 bg-white px-2 font-body-sm text-on-surface outline-none focus:border-secondary"></label>
+        <label class="flex flex-col gap-1 font-label-sm text-label-sm font-semibold text-on-surface-variant">Isi per kemasan<input id="editDepositQuantity" maxlength="80" class="h-11 rounded-xl border border-outline-variant/60 bg-white px-3 font-body-sm text-on-surface outline-none focus:border-secondary"></label>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <label class="flex flex-col gap-1 font-label-sm text-label-sm font-semibold text-on-surface-variant">Jumlah kemasan<input id="editDepositCount" type="number" min="1" max="999" required class="h-11 rounded-xl border border-outline-variant/60 bg-white px-3 font-body-sm text-on-surface outline-none focus:border-secondary"></label>
+        <label class="flex flex-col gap-1 font-label-sm text-label-sm font-semibold text-on-surface-variant">Kondisi<select id="editDepositCondition" class="h-11 rounded-xl border border-outline-variant/60 bg-white px-3 font-body-sm text-on-surface outline-none focus:border-secondary"><option>Aman Disimpan</option><option>Mendekati ED</option><option>Kedaluwarsa</option><option>Rusak / Cair</option></select></label>
+      </div>
+      <label class="flex flex-col gap-1 font-label-sm text-label-sm font-semibold text-on-surface-variant">Batch / lot<input id="editDepositBatch" maxlength="80" class="h-11 rounded-xl border border-outline-variant/60 bg-white px-3 font-body-sm text-on-surface outline-none focus:border-secondary"></label>
+      <p id="depositEditError" class="font-body-sm text-body-sm text-error" role="alert" hidden></p>
+      <button class="mt-1 h-12 w-full rounded-full bg-primary font-label-lg text-label-lg font-bold text-white" type="submit">Simpan Perubahan</button>
+    </div>
+  </form>
+</div>
+
 <section id="scannerScreen" class="scan-screen fixed inset-y-0 left-1/2 z-[60] flex w-full max-w-[480px] -translate-x-1/2 flex-col overflow-y-auto bg-surface pb-20" aria-label="Scan obat" hidden>
   <div class="camera-stage relative flex w-full flex-col justify-between overflow-hidden bg-inverse-surface">
     <video id="cameraPreview" class="absolute inset-0 h-full w-full object-cover" autoplay playsinline muted aria-label="Tampilan kamera"></video>
@@ -527,15 +615,15 @@ tailwind.config = {
 
     <div class="relative z-10 mx-auto mt-3 flex items-center rounded-full bg-inverse-surface/75 p-1 backdrop-blur-md" role="tablist" aria-label="Mode pemindaian">
       <button type="button" class="scan-mode rounded-full bg-secondary-container px-3 py-2 font-label-sm text-label-sm font-bold text-on-secondary-container" data-mode="barcode" role="tab" aria-selected="true">Barcode</button>
-      <button type="button" class="scan-mode rounded-full px-3 py-2 font-label-sm text-label-sm text-white" data-mode="package" role="tab" aria-selected="false">Foto + OCR</button>
+      <button type="button" class="scan-mode rounded-full px-3 py-2 font-label-sm text-label-sm text-white" data-mode="package" role="tab" aria-selected="false">Foto + Demo</button>
       <button type="button" class="scan-mode rounded-full px-3 py-2 font-label-sm text-label-sm text-white" data-mode="manual" role="tab" aria-selected="false">Manual</button>
     </div>
 
     <div id="viewfinder" class="relative z-10 m-auto flex h-40 w-[min(72vw,280px)] items-center justify-center">
-      <span class="absolute left-0 top-0 h-7 w-7 rounded-tl-xl border-l-[3px] border-t-[3px] border-secondary-container shadow-[0_0_10px_rgba(134,242,228,0.5)]"></span>
-      <span class="absolute right-0 top-0 h-7 w-7 rounded-tr-xl border-r-[3px] border-t-[3px] border-secondary-container shadow-[0_0_10px_rgba(134,242,228,0.5)]"></span>
-      <span class="absolute bottom-0 left-0 h-7 w-7 rounded-bl-xl border-b-[3px] border-l-[3px] border-secondary-container shadow-[0_0_10px_rgba(134,242,228,0.5)]"></span>
-      <span class="absolute bottom-0 right-0 h-7 w-7 rounded-br-xl border-b-[3px] border-r-[3px] border-secondary-container shadow-[0_0_10px_rgba(134,242,228,0.5)]"></span>
+      <span class="scan-corner absolute left-0 top-0 h-7 w-7 rounded-tl-xl border-l-[3px] border-t-[3px] border-secondary-container shadow-[0_0_10px_rgba(134,242,228,0.5)]"></span>
+      <span class="scan-corner absolute right-0 top-0 h-7 w-7 rounded-tr-xl border-r-[3px] border-t-[3px] border-secondary-container shadow-[0_0_10px_rgba(134,242,228,0.5)]"></span>
+      <span class="scan-corner absolute bottom-0 left-0 h-7 w-7 rounded-bl-xl border-b-[3px] border-l-[3px] border-secondary-container shadow-[0_0_10px_rgba(134,242,228,0.5)]"></span>
+      <span class="scan-corner absolute bottom-0 right-0 h-7 w-7 rounded-br-xl border-b-[3px] border-r-[3px] border-secondary-container shadow-[0_0_10px_rgba(134,242,228,0.5)]"></span>
       <span id="scanLaser" class="scan-laser absolute inset-x-2 h-0.5 bg-gradient-to-r from-transparent via-secondary-container to-transparent shadow-[0_0_12px_#86f2e4]"></span>
       <span class="material-symbols-outlined text-[30px] text-secondary-container/60">filter_center_focus</span>
     </div>
@@ -545,6 +633,10 @@ tailwind.config = {
       <button id="choosePhoto" type="button" class="flex items-center gap-1 rounded-full bg-white/15 px-3 py-1.5 font-label-sm text-white backdrop-blur-md">
         <span class="material-symbols-outlined text-[17px]">photo_camera</span>
         <span>Ambil / pilih foto</span>
+      </button>
+      <button id="captureOcrPhoto" type="button" class="hidden items-center gap-1 rounded-full bg-secondary-container px-4 py-2 font-label-md text-label-md font-bold text-on-secondary-container shadow-lg" disabled>
+        <span class="material-symbols-outlined text-[19px]">photo_camera</span>
+        <span>Ambil foto (demo)</span>
       </button>
       <input id="photoInput" class="hidden" type="file" accept="image/*">
     </div>
@@ -634,9 +726,13 @@ tailwind.config = {
         <span class="material-symbols-outlined text-[20px] text-secondary">verified</span>
         <div class="min-w-0 flex-1">
           <span class="block font-label-md text-label-md font-bold text-primary">Periksa data obat</span>
-          <span class="block font-body-sm text-body-sm text-on-surface-variant">Hasil baca foto adalah perkiraan. Cocokkan kembali dengan kemasan.</span>
+          <span class="block font-body-sm text-body-sm text-on-surface-variant">Mode demo: detail contoh Panadol, bukan hasil pembacaan obat yang sebenarnya.</span>
         </div>
       </div>
+      <button id="manualPhotoButton" type="button" class="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border border-dashed border-secondary bg-secondary-container/30 px-3 py-2 font-label-md text-label-md font-semibold text-primary">
+        <span class="material-symbols-outlined text-[20px]">add_a_photo</span>
+        <span>Ambil foto untuk isi contoh Panadol (demo)</span>
+      </button>
       <label class="flex flex-col gap-1 font-label-sm text-label-sm font-semibold text-on-surface-variant">
         Nama obat
         <input id="medicineName" name="medicineName" required maxlength="100" autocomplete="off" placeholder="Contoh: Paracetamol 500 mg" class="h-11 rounded-xl border border-outline-variant/60 bg-white px-3 font-body-md text-body-md text-on-surface outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20">
@@ -651,8 +747,8 @@ tailwind.config = {
           <input id="medicineStrength" name="strength" maxlength="80" autocomplete="off" placeholder="Contoh: 500 mg" class="h-11 min-w-0 rounded-xl border border-outline-variant/60 bg-white px-3 font-body-sm text-on-surface outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20">
         </label>
         <label class="flex min-w-0 flex-col gap-1 font-label-sm text-label-sm font-semibold text-on-surface-variant">
-          Bentuk obat
-          <input id="medicineFormType" name="formType" maxlength="80" autocomplete="off" placeholder="Tablet, sirup..." class="h-11 min-w-0 rounded-xl border border-outline-variant/60 bg-white px-3 font-body-sm text-on-surface outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20">
+          Bentuk obat <span class="font-normal">(boleh kosong jika tidak terbaca)</span>
+          <input id="medicineFormType" name="formType" maxlength="80" autocomplete="off" placeholder="Tablet, sirup, atau kosongkan" class="h-11 min-w-0 rounded-xl border border-outline-variant/60 bg-white px-3 font-body-sm text-on-surface outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20">
         </label>
       </div>
       <label class="flex flex-col gap-1 font-label-sm text-label-sm font-semibold text-on-surface-variant">
@@ -665,12 +761,12 @@ tailwind.config = {
       </label>
       <div class="grid grid-cols-2 gap-3">
         <label class="flex min-w-0 flex-col gap-1 font-label-sm text-label-sm font-semibold text-on-surface-variant">
-          Kedaluwarsa <span class="font-normal">(wajib diverifikasi)</span>
+          Kedaluwarsa <span class="font-normal">(wajib dicek &amp; diisi)</span>
           <input id="medicineExpiry" name="expiry" type="date" required class="h-11 min-w-0 rounded-xl border border-outline-variant/60 bg-white px-2 font-body-sm text-on-surface outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20">
         </label>
         <label class="flex min-w-0 flex-col gap-1 font-label-sm text-label-sm font-semibold text-on-surface-variant">
-          Isi per kemasan
-          <input id="medicineQuantity" name="quantity" maxlength="80" autocomplete="off" placeholder="Contoh: 10 tablet" class="h-11 min-w-0 rounded-xl border border-outline-variant/60 bg-white px-3 font-body-sm text-on-surface outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20">
+          Isi per kemasan <span class="font-normal">(boleh kosong jika tidak terbaca)</span>
+          <input id="medicineQuantity" name="quantity" maxlength="80" autocomplete="off" placeholder="Contoh: 10 tablet, atau kosongkan" class="h-11 min-w-0 rounded-xl border border-outline-variant/60 bg-white px-3 font-body-sm text-on-surface outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20">
         </label>
       </div>
       <div class="grid grid-cols-2 gap-3">
@@ -684,7 +780,7 @@ tailwind.config = {
         </label>
       </div>
       <details class="rounded-xl bg-surface-container-low p-3">
-        <summary class="cursor-pointer font-label-sm text-label-sm font-semibold text-primary">Lihat teks yang terbaca dari foto</summary>
+        <summary class="cursor-pointer font-label-sm text-label-sm font-semibold text-primary">Lihat keterangan data demo</summary>
         <pre id="ocrText" class="mt-2 max-h-32 overflow-auto whitespace-pre-wrap break-words font-body-sm text-body-sm text-on-surface-variant"></pre>
       </details>
       <label class="flex flex-col gap-1 font-label-sm text-label-sm font-semibold text-on-surface-variant">
@@ -698,7 +794,7 @@ tailwind.config = {
       </label>
       <div class="flex items-start gap-2 rounded-xl bg-secondary-container/35 p-3">
         <span class="material-symbols-outlined text-[18px] text-secondary">recycling</span>
-        <p class="font-body-sm text-body-sm text-on-surface-variant">OCR membaca teks yang tampak pada foto saja. Tanggal kedaluwarsa, dosis, jumlah, dan produsen yang tidak terlihat tidak bisa ditebak—periksa kemasan asli.</p>
+        <p class="font-body-sm text-body-sm text-on-surface-variant">Mode demo selalu menggunakan contoh Panadol dengan jumlah pil dan tanggal kedaluwarsa dummy. Jangan anggap data ini hasil pembacaan obat atau label sebenarnya.</p>
       </div>
       <p id="formStatus" class="font-label-sm text-label-sm text-error" role="alert" hidden></p>
       <button type="submit" class="flex h-[52px] w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary to-primary-container font-label-lg text-label-lg font-bold text-white shadow-[0_8px_20px_rgba(15,76,129,0.25)]">
@@ -740,6 +836,8 @@ tailwind.config = {
   (() => {
     const homeScreen = document.getElementById('homeScreen');
     const scannerScreen = document.getElementById('scannerScreen');
+    const depositScreen = document.getElementById('depositScreen');
+    let activePage = 'home';
     const cameraPreview = document.getElementById('cameraPreview');
     const capturedPreview = document.getElementById('capturedPreview');
     const cameraStatus = document.getElementById('cameraStatus');
@@ -751,6 +849,7 @@ tailwind.config = {
     const recognitionResult = document.getElementById('recognitionResult');
     const resultStatus = document.getElementById('resultStatus');
     const photoInput = document.getElementById('photoInput');
+    const captureOcrPhoto = document.getElementById('captureOcrPhoto');
     const videoConstraints = {
       audio: false,
       video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }
@@ -762,7 +861,6 @@ tailwind.config = {
     let scanMode = 'barcode';
     let torchEnabled = false;
     let photoUrl = null;
-    let ocrWorkerPromise = null;
     let isScanningFrame = false;
     let cameraGeneration = 0;
     let permissionTimer = null;
@@ -770,52 +868,6 @@ tailwind.config = {
     let lastOcrConfidence = null;
 
     const setCameraStatus = (message) => { cameraStatus.textContent = message; };
-
-    const productCatalog = [
-      {
-        pattern: /\bpanad[o0][l1]\b/i,
-        name: 'Panadol',
-        ingredient: 'Paracetamol',
-        manufacturer: 'Haleon',
-        category: 'Analgesik & Antipiretik'
-      },
-      {
-        pattern: /\b(?:paracetam[o0]l|acetaminophen)\b/i,
-        name: 'Paracetamol',
-        ingredient: 'Paracetamol',
-        category: 'Analgesik & Antipiretik'
-      },
-      {
-        pattern: /\bibuprofen\b/i,
-        name: 'Ibuprofen',
-        ingredient: 'Ibuprofen',
-        category: 'Analgesik & Antiinflamasi'
-      },
-      {
-        pattern: /\bamoxicillin\b/i,
-        name: 'Amoxicillin',
-        ingredient: 'Amoxicillin',
-        category: 'Antibiotik'
-      },
-      {
-        pattern: /\b(?:cetirizine|cetirizin)\b/i,
-        name: 'Cetirizine',
-        ingredient: 'Cetirizine',
-        category: 'Antihistamin'
-      },
-      {
-        pattern: /\bloratadine\b/i,
-        name: 'Loratadine',
-        ingredient: 'Loratadine',
-        category: 'Antihistamin'
-      },
-      {
-        pattern: /\bomeprazole\b/i,
-        name: 'Omeprazole',
-        ingredient: 'Omeprazole',
-        category: 'Obat lambung'
-      }
-    ];
 
     const formatExpiry = (value) => {
       if (!value) return 'Tidak terbaca — cek kemasan';
@@ -838,6 +890,7 @@ tailwind.config = {
       barcode: document.getElementById('medicineBarcode').value.trim(),
       ingredientInferred: Boolean(recognizedMedicine?.ingredientInferred),
       manufacturerInferred: Boolean(recognizedMedicine?.manufacturerInferred),
+      isDemo: Boolean(recognizedMedicine?.isDemo),
       category: recognizedMedicine?.category || 'Obat terdeteksi dari kemasan'
     });
 
@@ -847,10 +900,10 @@ tailwind.config = {
       const hasMedicineName = Boolean(medicine.name);
       const productLabel = [medicine.name, medicine.strength].filter(Boolean).join(' ');
       document.getElementById('recognitionState').textContent = hasMedicineName
-        ? `Obat terdeteksi: ${medicine.name}`
+        ? `${medicine.isDemo ? 'DEMO · ' : 'Obat terdeteksi: '}${medicine.name}`
         : 'Kemasan terdeteksi — cek nama obat';
       document.getElementById('recognitionConfidence').textContent = confidence === null
-        ? 'Periksa kemasan'
+        ? medicine.isDemo ? 'DATA DUMMY' : 'Periksa kemasan'
         : `Teks ${Math.round(confidence)}%`;
       document.getElementById('medicineCategory').textContent = medicine.category;
       document.getElementById('recognizedName').textContent = productLabel || 'Nama obat belum terbaca';
@@ -866,7 +919,9 @@ tailwind.config = {
       document.getElementById('recognizedContents').textContent = [medicine.formType, medicine.quantity].filter(Boolean).join(' · ') || 'Belum terbaca — cek kemasan';
       document.getElementById('recognizedThumbnail').src = photoUrl || '';
       document.getElementById('recognizedThumbnail').classList.toggle('hidden', !photoUrl);
-      document.getElementById('recognitionDisclaimer').textContent = medicine.expiry
+      document.getElementById('recognitionDisclaimer').textContent = medicine.isDemo
+        ? 'Mode demo: hasil selalu ditampilkan sebagai Panadol 500 mg dengan data contoh. Nama obat, jumlah pil, dan tanggal kedaluwarsa ini bukan hasil verifikasi dari kemasan.'
+        : medicine.expiry
         ? 'Hasil pengenalan gambar bisa keliru. Pastikan nama, ED, isi kemasan, dan kondisi sesuai obat yang akan disetor.'
         : 'Foto sisi ini belum menampilkan tanggal kedaluwarsa. Unggah foto sisi blister/kotak yang mencantumkan EXP atau ED untuk membacanya.';
       document.querySelectorAll('.condition-chip').forEach((button) => {
@@ -881,212 +936,46 @@ tailwind.config = {
       resultStatus.hidden = true;
     };
 
-    const loadOcrEngine = () => {
-      if (window.Tesseract) {
-        return Promise.resolve(window.Tesseract);
-      }
-      if (!ocrWorkerPromise) {
-        ocrWorkerPromise = new Promise((resolve, reject) => {
-          const script = document.createElement('script');
-          script.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';
-          script.onload = () => window.Tesseract ? resolve(window.Tesseract) : reject(new Error('Library OCR tidak berhasil dimuat.'));
-          script.onerror = () => reject(new Error('Library OCR tidak dapat diunduh. Periksa koneksi internet.'));
-          document.head.append(script);
-        }).catch((error) => {
-          ocrWorkerPromise = null;
-          throw error;
-        });
-      }
-      return ocrWorkerPromise;
-    };
-
-    const parseExpiry = (text) => {
-      const monthNumbers = {
-        jan: 1, january: 1, januari: 1, feb: 2, february: 2, februari: 2,
-        mar: 3, march: 3, maret: 3, apr: 4, april: 4, may: 5, mei: 5,
-        jun: 6, june: 6, juni: 6, jul: 7, july: 7, juli: 7, aug: 8, august: 8, agustus: 8,
-        sep: 9, sept: 9, september: 9, oct: 10, october: 10, oktober: 10,
-        nov: 11, november: 11, dec: 12, december: 12, desember: 12
+    const applyDemoPanadol = (barcode = '', manualEntry = false) => {
+      const demoMedicine = {
+        name: 'Panadol',
+        strength: '500 mg',
+        formType: 'Tablet',
+        ingredient: 'Paracetamol',
+        manufacturer: 'Haleon',
+        expiry: '2027-12-31',
+        quantity: '1 blister × 10 kaplet',
+        depositCount: '1',
+        batch: '',
+        condition: 'Aman Disimpan',
+        barcode,
+        category: 'Analgesik & Antipiretik',
+        isDemo: true
       };
-      const lines = text.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
-      for (const line of lines) {
-        if (!/\b(?:EXP(?:IRY|IRATION)?|ED|KEDALUWARSA|BEST\s*BEFORE|USE\s*BY)\b/i.test(line)) {
-          continue;
-        }
-        const iso = line.match(/\b(20\d{2})[-/.](0?[1-9]|1[0-2])(?:[-/.](0?[1-9]|[12]\d|3[01]))?\b/);
-        if (iso) {
-          const isoDay = line.match(/\b20\d{2}[-/.](?:0?[1-9]|1[0-2])[-/.](0?[1-9]|[12]\d|3[01])\b/);
-          const lastDay = new Date(Number(iso[1]), Number(iso[2]), 0).getDate();
-          return `${iso[1]}-${iso[2].padStart(2, '0')}-${isoDay ? isoDay[1].padStart(2, '0') : String(lastDay).padStart(2, '0')}`;
-        }
-        const dayFirst = line.match(/\b(0?[1-9]|[12]\d|3[01])\s*[/.-]\s*(0?[1-9]|1[0-2])\s*[/.-]\s*(20\d{2}|\d{2})\b/);
-        if (dayFirst) {
-          const year = dayFirst[3].length === 2 ? `20${dayFirst[3]}` : dayFirst[3];
-          return `${year}-${dayFirst[2].padStart(2, '0')}-${dayFirst[1].padStart(2, '0')}`;
-        }
-        const numeric = line.match(/\b(0?[1-9]|1[0-2])\s*[/.-]\s*(20\d{2}|\d{2})\b/);
-        if (numeric) {
-          const year = numeric[2].length === 2 ? `20${numeric[2]}` : numeric[2];
-          const lastDay = new Date(Number(year), Number(numeric[1]), 0).getDate();
-          return `${year}-${numeric[1].padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
-        }
-        const named = line.match(/\b([A-Za-z]{3,10})\.?\s*[-,/]?\s*(20\d{2}|\d{2})\b/i);
-        if (named) {
-          const month = monthNumbers[named[1].toLowerCase()];
-          if (month) {
-            const year = named[2].length === 2 ? `20${named[2]}` : named[2];
-            const lastDay = new Date(Number(year), month, 0).getDate();
-            return `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
-          }
-        }
-      }
-      return '';
-    };
-
-    const extractMedicineDetails = (text) => {
-      const lines = text.split(/\r?\n/).map((line) => line.replace(/[|_]/g, ' ').replace(/\s+/g, ' ').trim()).filter(Boolean);
-      const joined = lines.join(' ');
-      const detectedProduct = productCatalog.find((product) => product.pattern.test(joined) || product.pattern.test(lines.join('')));
-      const strengthMatch = joined.match(/\b\d+(?:[.,]\d+)?\s?(?:mg|mcg|µg|ug|g|ml|mL|IU|UI|%)(?:\s*\/\s*\d+(?:[.,]\d+)?\s?(?:ml|mL|g))?\b/i);
-      const formPatterns = [
-        ['Tablet', /\b(?:tablet|tablets|tab(?:let)?|kaplet|caplet)\b/i],
-        ['Kapsul', /\b(?:capsule|capsules|kapsul|caps)\b/i],
-        ['Sirup', /\b(?:syrup|sirup|oral solution)\b/i],
-        ['Suspensi', /\b(?:suspension|suspensi)\b/i],
-        ['Tetes', /\b(?:drops|drop|tetes)\b/i],
-        ['Salep', /\b(?:ointment|salep)\b/i],
-        ['Krim', /\b(?:cream|krim)\b/i],
-        ['Inhaler', /\b(?:inhaler|inhalasi)\b/i],
-        ['Injeksi', /\b(?:injection|injeksi)\b/i]
-      ];
-      const matchedForm = formPatterns.find(([, pattern]) => pattern.test(joined));
-      const manufacturerLine = lines.find((line) => /\b(?:PT\.?|CV\.?|produced by|manufactured by|manufactured for|diproduksi oleh)\b/i.test(line))
-        || lines.find((line) => /\bhaleon\b/i.test(line));
-      const ingredientLine = lines.find((line) => /\b(?:komposisi|composition|active ingredients?|each (?:tablet|capsule|5 ?ml) contains?)\b/i.test(line));
-      const batchLine = lines.find((line) => /\b(?:batch|lot)\s*(?:no\.?|number|#|:)?\s*[A-Z0-9-]{3,}\b/i.test(line));
-      const blisters = joined.match(/\bisi\s*[:.]?\s*(\d{1,2})\s*blister\s*@\s*(\d{1,3})\s*(tablet|tab|kaplet|kapsul)\b/i);
-      const strengthLineIndex = strengthMatch
-        ? lines.findIndex((line) => line.toLowerCase().includes(strengthMatch[0].toLowerCase()))
-        : -1;
-      const ignoredName = /\b(?:komposisi|composition|aturan pakai|dosis|batch|lot|exp|mfg|produsen|manufactured|diproduksi|tablet|kapsul|syrup|sirup|isi|contains)\b/i;
-      const stripStrength = (line) => line.replace(/\b\d+(?:[.,]\d+)?\s?(?:mg|mcg|µg|ug|g|ml|mL|IU|UI)\b.*$/i, '').trim();
-      const nameLine = strengthLineIndex >= 0
-        ? (stripStrength(lines[strengthLineIndex])
-          ? lines[strengthLineIndex]
-          : lines.slice(Math.max(0, strengthLineIndex - 2), strengthLineIndex).reverse().find((line) => !ignoredName.test(line)))
-        : lines.find((line) => /\b(?:paracetamol|acetaminophen|ibuprofen|amoxicillin|aspirin|loratadine|cetirizine|omeprazole|antacid)\b/i.test(line));
-      const quantityMatch = blisters || joined.match(/\b(?:isi|contains?|content|netto|pack(?:age)?\s*of)\s*[:.]?\s*(\d{1,3})\s*(tablet|tab|kapsul|capsule|caps|kaplet|ml|sachet|strip|pcs|pieces)?\b/i)
-        || joined.match(/\b(\d{1,3})\s*(tablet|tabs?|kapsul|capsules?|kaplet|sachets?|strips?|pcs|pieces)\b/i);
-      const name = detectedProduct?.name || (nameLine
-        ? stripStrength(nameLine).replace(/[^a-zA-Z0-9().+\-/ ]/g, '').trim()
-        : '');
-      return {
-        name,
-        category: detectedProduct?.category || 'Obat terdeteksi dari kemasan',
-        strength: strengthMatch?.[0]?.replace(/\s+/g, ' ') || '',
-        formType: matchedForm?.[0] || '',
-        ingredient: ingredientLine?.replace(/^.*?\b(?:komposisi|composition|active ingredients?|each (?:tablet|capsule|5 ?ml) contains?)\b\s*:?\s*/i, '').trim()
-          || detectedProduct?.ingredient
-          || '',
-        ingredientInferred: !ingredientLine && Boolean(detectedProduct?.ingredient),
-        manufacturer: manufacturerLine?.replace(/^(?:produced by|manufactured by|manufactured for|diproduksi oleh)\s*/i, '').trim()
-          || detectedProduct?.manufacturer
-          || '',
-        manufacturerInferred: !manufacturerLine && Boolean(detectedProduct?.manufacturer),
-        expiry: parseExpiry(text),
-        quantity: quantityMatch
-          ? blisters
-            ? `${blisters[1]} blister × ${blisters[2]} ${blisters[3]}`
-            : `${quantityMatch[1]}${quantityMatch[2] ? ` ${quantityMatch[2]}` : ''}`
-          : '',
-        batch: batchLine?.replace(/^.*?\b(?:batch|lot)\s*(?:no\.?|number|#|:)?\s*/i, '').trim() || ''
-      };
-    };
-
-    const recognizePhoto = async (file) => {
-      let worker;
-      try {
-        document.getElementById('ocrText').textContent = '';
+      document.getElementById('medicineName').value = demoMedicine.name;
+      document.getElementById('medicineStrength').value = demoMedicine.strength;
+      document.getElementById('medicineFormType').value = demoMedicine.formType;
+      document.getElementById('medicineIngredient').value = demoMedicine.ingredient;
+      document.getElementById('medicineManufacturer').value = demoMedicine.manufacturer;
+      document.getElementById('medicineExpiry').value = demoMedicine.expiry;
+      document.getElementById('medicineQuantity').value = demoMedicine.quantity;
+      document.getElementById('medicineDepositCount').value = demoMedicine.depositCount;
+      document.getElementById('medicineBatch').value = demoMedicine.batch;
+      document.getElementById('medicineCondition').value = demoMedicine.condition;
+      document.getElementById('medicineBarcode').value = barcode;
+      recognizedMedicine = demoMedicine;
+      lastOcrConfidence = null;
+      document.getElementById('ocrText').textContent = 'Mode demo: data contoh Panadol, bukan hasil pembacaan label.';
+      document.getElementById('addRecognizedMedicine').disabled = false;
+      document.getElementById('addRecognizedMedicine').querySelector('span:last-child').textContent = 'Tambahkan ke Setoran (+20 Poin)';
+      document.getElementById('addRecognizedMedicine').querySelector('.material-symbols-outlined').textContent = 'add_circle';
+      document.getElementById('editRecognizedMedicine').querySelector('span:last-child').textContent = 'Edit Data Manual';
+      medicineForm.hidden = true;
+      renderRecognitionResult(null);
+      scanNoticeText.textContent = 'Mode demo aktif. Contoh data Panadol ditampilkan; detail tidak berasal dari hasil scan.';
+      if (manualEntry) {
         recognitionResult.hidden = true;
-        setCameraStatus('Memeriksa barcode pada foto...');
-        if (await createBarcodeDetector()) {
-          let image;
-          try {
-            image = await createImageBitmap(file);
-            const codes = await barcodeDetector.detect(image);
-            const barcode = codes.find((code) => code.rawValue)?.rawValue;
-            if (barcode) {
-              document.getElementById('medicineBarcode').value = barcode;
-            }
-          } finally {
-            image?.close();
-          }
-        }
-        setCameraStatus('Memuat OCR untuk membaca teks pada foto...');
-        const tesseract = await loadOcrEngine();
-        worker = await tesseract.createWorker('eng', 1, {
-          logger: (progress) => {
-            if (progress.status === 'recognizing text') {
-              setCameraStatus(`Membaca teks pada foto... ${Math.round((progress.progress || 0) * 100)}%`);
-            } else if (progress.status === 'loading language traineddata') {
-              setCameraStatus('Menyiapkan pembaca teks...');
-            }
-          }
-        });
-        const result = await worker.recognize(file);
-        const text = result.data.text.trim();
-        lastOcrConfidence = result.data.confidence;
-        document.getElementById('ocrText').textContent = text || 'Tidak ada teks yang terbaca.';
-        const details = extractMedicineDetails(text);
-        recognizedMedicine = details;
-        document.getElementById('medicineName').value = details.name || '';
-        document.getElementById('medicineStrength').value = details.strength || '';
-        document.getElementById('medicineFormType').value = details.formType || '';
-        document.getElementById('medicineIngredient').value = details.ingredient || '';
-        document.getElementById('medicineManufacturer').value = details.manufacturer || '';
-        document.getElementById('medicineExpiry').value = details.expiry || '';
-        document.getElementById('medicineQuantity').value = details.quantity || '';
-        document.getElementById('medicineBatch').value = details.batch || '';
-        document.getElementById('medicineCondition').value = details.expiry && new Date(`${details.expiry}T00:00:00`) < new Date()
-          ? 'Kedaluwarsa'
-          : 'Aman Disimpan';
-        document.getElementById('medicineDepositCount').value = '1';
-        document.getElementById('medicineBarcode').value = document.getElementById('medicineBarcode').value || '';
-
-        if (!text) {
-          setCameraStatus('Teks tidak terbaca. Coba foto lebih dekat, terang, dan fokus.');
-          scanNoticeText.textContent = 'Teks pada foto belum terbaca. Coba unggah foto sisi label yang lebih dekat dan jelas.';
-          renderRecognitionResult(0);
-          return;
-        }
-        const found = [
-          details.name && 'nama',
-          details.strength && 'dosis',
-          details.formType && 'bentuk',
-          details.ingredient && !details.ingredientInferred && 'kandungan aktif',
-          details.expiry && 'kedaluwarsa',
-          details.quantity && 'jumlah',
-          details.manufacturer && 'produsen',
-          details.batch && 'batch/lot'
-        ].filter(Boolean);
-        const isRecognized = Boolean(details.name);
-        setCameraStatus(isRecognized
-          ? `Obat dikenali dari kemasan: ${details.name}. Periksa detail sebelum menyimpan.`
-          : 'Teks kemasan terbaca, tetapi nama obat belum dikenali.');
-        scanNoticeText.textContent = found.length
-          ? `Dikenali dari gambar: ${found.join(', ')}. Hasil OCR perlu dicocokkan dengan kemasan.`
-          : 'Teks kemasan terbaca, tetapi nama obat dan detailnya belum dapat dikenali.';
-        renderRecognitionResult(result.data.confidence);
-        medicineForm.hidden = true;
-      } catch (error) {
-        setCameraStatus(`Foto gagal dianalisis: ${error.message}`);
-        scanNoticeText.textContent = 'Gambar belum bisa dikenali. Coba foto label dengan cahaya cukup dan fokus.';
-        recognitionResult.hidden = true;
-        revealForm('Pengenalan gambar gagal. Kamu bisa mengisi data obat secara manual.');
-      } finally {
-        if (worker) {
-          await worker.terminate();
-        }
+        revealForm('Mode demo: contoh data Panadol sudah diisikan. Kamu bisa mengubah atau menyimpan data ini.');
       }
     };
 
@@ -1129,18 +1018,109 @@ tailwind.config = {
       details.append(name, meta, extra, expiry);
       const status = document.createElement('span');
       status.className = 'rounded-full bg-secondary-container/50 px-2 py-1 font-label-sm text-label-sm font-bold text-on-secondary-container';
-      status.textContent = 'Baru';
+      status.textContent = deposit.isDemo ? 'DEMO' : 'Baru';
       card.append(icon, details, status);
       document.getElementById('scanDepositList').prepend(card);
+    };
+
+    const getDepositConditionClasses = (condition) => {
+      if (condition === 'Kedaluwarsa') return 'bg-error-container text-on-error-container';
+      if (condition === 'Rusak / Cair') return 'bg-surface-container-high text-on-surface-variant';
+      if (condition === 'Mendekati ED') return 'bg-primary-fixed text-on-primary-fixed-variant';
+      return 'bg-secondary-container text-on-secondary-container';
+    };
+
+    const renderDepositItem = (deposit) => {
+      const card = document.createElement('article');
+      card.className = 'overflow-hidden rounded-2xl bg-surface-container-lowest shadow-[0_4px_16px_-2px_rgba(15,76,129,0.07)]';
+      const content = document.createElement('div');
+      content.className = 'flex items-start gap-3 p-4';
+      const image = document.createElement('div');
+      image.className = 'flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-surface-container text-secondary';
+      const icon = document.createElement('span');
+      icon.className = 'material-symbols-outlined text-[30px]';
+      icon.textContent = /sirup|suspensi|cair/i.test(deposit.formType || '') ? 'science' : 'medication';
+      image.append(icon);
+      const detail = document.createElement('div');
+      detail.className = 'min-w-0 flex-1';
+      const titleRow = document.createElement('div');
+      titleRow.className = 'flex items-start justify-between gap-1';
+      const name = document.createElement('h2');
+      name.className = 'truncate font-headline-sm text-headline-sm font-bold text-primary';
+      name.textContent = [deposit.name, deposit.strength].filter(Boolean).join(' ');
+      const badge = document.createElement('span');
+      badge.className = `shrink-0 rounded-full px-2 py-1 font-label-sm text-label-sm font-bold ${deposit.isDemo ? 'bg-primary-fixed text-on-primary-fixed-variant' : getDepositConditionClasses(deposit.condition)}`;
+      badge.textContent = deposit.isDemo ? 'DEMO' : deposit.condition || 'Aman Disimpan';
+      titleRow.append(name, badge);
+      const quantity = document.createElement('p');
+      quantity.className = 'mt-0.5 truncate font-body-sm text-body-sm text-on-surface-variant';
+      quantity.textContent = `${deposit.depositCount || 1} kemasan${deposit.quantity ? ` (${deposit.quantity})` : ''}`;
+      const expiryRow = document.createElement('div');
+      expiryRow.className = `mt-1.5 flex items-center gap-1.5 font-label-sm text-label-sm font-semibold ${deposit.expiry && new Date(`${deposit.expiry}T00:00:00`) < new Date() ? 'text-error' : 'text-on-surface-variant'}`;
+      const expiryIcon = document.createElement('span');
+      expiryIcon.className = 'material-symbols-outlined text-[15px]';
+      expiryIcon.textContent = 'event';
+      const expiry = document.createElement('span');
+      expiry.textContent = `Kedaluwarsa: ${formatExpiry(deposit.expiry)}`;
+      expiryRow.append(expiryIcon, expiry);
+      detail.append(titleRow, quantity, expiryRow);
+      content.append(image, detail);
+
+      const actions = document.createElement('div');
+      actions.className = 'flex items-center justify-between gap-2 border-t border-surface-container-low bg-surface-container-low/50 px-4 py-2.5';
+      const category = document.createElement('span');
+      category.className = 'min-w-0 truncate font-body-sm text-body-sm text-on-surface-variant';
+      category.textContent = `Kategori: ${deposit.formType || 'Belum ditentukan'}`;
+      const buttons = document.createElement('div');
+      buttons.className = 'flex shrink-0 items-center gap-1';
+      const edit = document.createElement('button');
+      edit.type = 'button';
+      edit.dataset.editDeposit = deposit.id;
+      edit.setAttribute('aria-label', `Edit ${deposit.name}`);
+      edit.className = 'flex h-8 w-8 items-center justify-center rounded-full text-primary-container hover:bg-surface-container';
+      edit.innerHTML = '<span class="material-symbols-outlined text-[18px]">edit</span>';
+      const remove = document.createElement('button');
+      remove.type = 'button';
+      remove.dataset.deleteDeposit = deposit.id;
+      remove.setAttribute('aria-label', `Hapus ${deposit.name}`);
+      remove.className = 'flex h-8 w-8 items-center justify-center rounded-full text-error hover:bg-error-container/40';
+      remove.innerHTML = '<span class="material-symbols-outlined text-[18px]">delete</span>';
+      buttons.append(edit, remove);
+      actions.append(category, buttons);
+      card.append(content, actions);
+      return card;
+    };
+
+    const renderDepositScreen = (deposits) => {
+      const list = document.getElementById('depositItems');
+      list.replaceChildren(...deposits.map(renderDepositItem));
+      document.getElementById('depositEmptyState').hidden = deposits.length > 0;
+      const itemCount = deposits.reduce((total, deposit) => total + Number(deposit.depositCount || 1), 0);
+      const typeCount = deposits.length;
+      const points = itemCount * 20;
+      const estimatedWeight = itemCount * 0.1;
+      const summary = `${typeCount} Jenis Obat • ${itemCount} Item`;
+      document.getElementById('depositSummaryCount').textContent = summary;
+      document.getElementById('depositSummaryImpact').textContent = `~${(itemCount * 0.07).toFixed(2)} kg CO₂e`;
+      document.getElementById('depositSummaryPoints').textContent = `☆ +${points} Poin`;
+      document.getElementById('depositFooterCount').textContent = `${typeCount} Jenis (${itemCount} Item)`;
+      document.getElementById('depositFooterWeight').lastChild.textContent = `Est. ${estimatedWeight.toFixed(1)} kg`;
     };
 
     const renderSavedDeposits = () => {
       try {
         const deposits = loadDeposits();
+        document.getElementById('depositPageError').hidden = true;
+        const homeList = document.getElementById('scanDepositList');
+        homeList.replaceChildren();
         deposits.forEach(addDepositCard);
         document.getElementById('depositCount').textContent = `Semua (${deposits.length + 1})`;
+        renderDepositScreen(deposits);
       } catch (error) {
         console.error('Tidak dapat memuat setoran hasil scan:', error);
+        const pageError = document.getElementById('depositPageError');
+        pageError.textContent = `Data setoran tidak dapat dimuat: ${error.message}`;
+        pageError.hidden = false;
       }
     };
 
@@ -1164,6 +1144,7 @@ tailwind.config = {
         cameraStream = null;
       }
       cameraPreview.srcObject = null;
+      captureOcrPhoto.disabled = true;
       torchEnabled = false;
       const flashButton = document.getElementById('flashToggle');
       flashButton.setAttribute('aria-pressed', 'false');
@@ -1193,9 +1174,8 @@ tailwind.config = {
         const value = codes.find((code) => code.rawValue)?.rawValue;
         if (value) {
           stopDetection();
-          document.getElementById('medicineBarcode').value = value;
-          setCameraStatus('Barcode terbaca. Lengkapi detail obat sebelum disimpan.');
-          revealForm('Barcode terbaca. Nama obat dan tanggal kedaluwarsa perlu kamu periksa dan isi sendiri.');
+          applyDemoPanadol(value);
+          setCameraStatus('Barcode terbaca. Mode demo mengisi contoh data Panadol untuk diperiksa.');
           return;
         }
       } catch (error) {
@@ -1255,6 +1235,7 @@ tailwind.config = {
         cameraStream = stream;
         cameraPreview.srcObject = cameraStream;
         await cameraPreview.play();
+        captureOcrPhoto.disabled = false;
         if (scanMode === 'barcode') {
           const isSupported = await createBarcodeDetector();
           if (isSupported) {
@@ -1275,6 +1256,7 @@ tailwind.config = {
           return;
         }
         stopCamera();
+        captureOcrPhoto.disabled = true;
         if (error.name === 'NotAllowedError' || error.name === 'SecurityError') {
           setCameraStatus('Izin kamera ditolak. Aktifkan izin kamera di browser atau gunakan mode Manual.');
         } else if (error.name === 'NotFoundError' || error.name === 'OverconstrainedError') {
@@ -1287,6 +1269,7 @@ tailwind.config = {
 
     const setMode = async (mode) => {
       scanMode = mode;
+      document.getElementById('viewfinder').classList.toggle('barcode-frame', mode === 'barcode');
       document.querySelectorAll('.scan-mode').forEach((button) => {
         const active = button.dataset.mode === mode;
         button.setAttribute('aria-selected', String(active));
@@ -1298,12 +1281,19 @@ tailwind.config = {
       stopDetection();
       capturedPreview.classList.add('hidden');
       cameraPreview.classList.remove('hidden');
+      captureOcrPhoto.classList.toggle('hidden', mode !== 'package');
+      captureOcrPhoto.classList.toggle('flex', mode === 'package');
+      captureOcrPhoto.disabled = true;
       if (photoUrl) {
         URL.revokeObjectURL(photoUrl);
         photoUrl = null;
       }
       if (mode === 'manual') {
         stopCamera();
+        recognizedMedicine = null;
+        medicineForm.reset();
+        document.getElementById('medicineDepositCount').value = '1';
+        document.getElementById('medicineCondition').value = 'Aman Disimpan';
         cameraPreview.classList.add('hidden');
         recognitionResult.hidden = true;
         document.getElementById('viewfinder').classList.add('hidden');
@@ -1326,18 +1316,34 @@ tailwind.config = {
           scanVideoFrame();
         }
       } else {
-        stopCamera();
-        cameraPreview.classList.add('hidden');
-        modeHint.textContent = 'Upload atau foto label obat untuk membaca teks';
-        scanNoticeText.textContent = 'OCR membaca teks kemasan di browser dan membantu mengisi data. Hasil bukan verifikasi medis—periksa setiap nilai.';
-        setCameraStatus('Siap membaca tulisan pada foto kemasan.');
+        modeHint.textContent = 'Pindai atau foto kemasan untuk melihat hasil demo';
+        scanNoticeText.textContent = 'Mode demo tidak membaca obat asli. Scan/foto menampilkan contoh Panadol dengan detail dummy.';
+        setCameraStatus('Membuka kamera untuk memindai tulisan pada kemasan...');
         capturedPreview.classList.add('hidden');
         medicineForm.hidden = true;
+        await startCamera();
+        captureOcrPhoto.disabled = !cameraStream;
       }
+    };
+
+    const setActivePage = (page) => {
+      activePage = page;
+      homeScreen.hidden = page !== 'home';
+      depositScreen.hidden = page !== 'deposit';
+      document.querySelector('[data-path="beranda"]').setAttribute('aria-current', String(page === 'home'));
+      document.querySelector('[data-path="setor"]').setAttribute('aria-current', String(page === 'deposit'));
+      document.querySelector('[data-path="beranda"]').classList.toggle('text-primary', page === 'home');
+      document.querySelector('[data-path="beranda"]').classList.toggle('font-bold', page === 'home');
+      document.querySelector('[data-path="setor"]').classList.toggle('text-primary', page === 'deposit');
+      document.querySelector('[data-path="setor"]').classList.toggle('font-bold', page === 'deposit');
+      document.querySelector('[data-path="beranda"]').classList.toggle('text-on-surface-variant', page !== 'home');
+      document.querySelector('[data-path="setor"]').classList.toggle('text-on-surface-variant', page !== 'deposit');
+      window.scrollTo({ top: 0, behavior: 'auto' });
     };
 
     const openScanner = () => {
       homeScreen.hidden = true;
+      depositScreen.hidden = true;
       scannerScreen.hidden = false;
       document.body.style.overflow = 'hidden';
       setMode('barcode');
@@ -1350,7 +1356,8 @@ tailwind.config = {
         photoUrl = null;
       }
       scannerScreen.hidden = true;
-      homeScreen.hidden = false;
+      homeScreen.hidden = activePage !== 'home';
+      depositScreen.hidden = activePage !== 'deposit';
       document.body.style.overflow = '';
       document.querySelector('[data-path="scan"]').setAttribute('aria-current', 'false');
     };
@@ -1366,13 +1373,137 @@ tailwind.config = {
       if (!scannerScreen.hidden) {
         closeScanner();
       }
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setActivePage('home');
+    });
+    document.querySelector('[data-path="setor"]').addEventListener('click', (event) => {
+      event.preventDefault();
+      if (!scannerScreen.hidden) closeScanner();
+      setActivePage('deposit');
+      renderSavedDeposits();
+    });
+    document.querySelectorAll('[data-open-deposit]').forEach((control) => {
+      control.addEventListener('click', () => {
+        setActivePage('deposit');
+        renderSavedDeposits();
+      });
+    });
+    document.getElementById('depositCount').addEventListener('click', (event) => {
+      event.preventDefault();
+      setActivePage('deposit');
+      renderSavedDeposits();
+    });
+    document.getElementById('addDepositItem').addEventListener('click', () => openScanner());
+    document.getElementById('findReturnPoint').addEventListener('click', () => {
+      window.alert('Pencarian titik pengembalian akan segera tersedia.');
+    });
+
+    const closeDepositEditor = () => {
+      document.getElementById('depositEditModal').hidden = true;
+      document.body.style.overflow = '';
+    };
+    const openDepositEditor = (deposit) => {
+      document.getElementById('depositEditTitle').textContent = `Edit ${deposit.name}`;
+      document.getElementById('editDepositId').value = deposit.id;
+      document.getElementById('editDepositName').value = deposit.name || '';
+      document.getElementById('editDepositBarcode').value = deposit.barcode || '';
+      document.getElementById('editDepositStrength').value = deposit.strength || '';
+      document.getElementById('editDepositFormType').value = deposit.formType || '';
+      document.getElementById('editDepositIngredient').value = deposit.ingredient || '';
+      document.getElementById('editDepositManufacturer').value = deposit.manufacturer || '';
+      document.getElementById('editDepositExpiry').value = deposit.expiry || '';
+      document.getElementById('editDepositQuantity').value = deposit.quantity || '';
+      document.getElementById('editDepositCount').value = deposit.depositCount || 1;
+      document.getElementById('editDepositCondition').value = deposit.condition || 'Aman Disimpan';
+      document.getElementById('editDepositBatch').value = deposit.batch || '';
+      document.getElementById('depositEditError').hidden = true;
+      document.getElementById('depositEditModal').hidden = false;
+      document.body.style.overflow = 'hidden';
+    };
+    document.getElementById('depositItems').addEventListener('click', (event) => {
+      const editButton = event.target.closest('[data-edit-deposit]');
+      const deleteButton = event.target.closest('[data-delete-deposit]');
+      if (!editButton && !deleteButton) return;
+      try {
+        const deposits = loadDeposits();
+        if (editButton) {
+          const target = deposits.find((deposit) => deposit.id === editButton.dataset.editDeposit);
+          if (target) openDepositEditor(target);
+          return;
+        }
+        const target = deposits.find((deposit) => deposit.id === deleteButton.dataset.deleteDeposit);
+        if (!target || !window.confirm(`Hapus ${target.name} dari daftar setoran?`)) return;
+        localStorage.setItem(storageKey, JSON.stringify(deposits.filter((deposit) => deposit.id !== target.id)));
+        renderSavedDeposits();
+      } catch (error) {
+        const errorMessage = `Daftar setoran tidak dapat diperbarui: ${error.message}`;
+        const pageError = document.getElementById('depositPageError');
+        pageError.textContent = errorMessage;
+        pageError.hidden = false;
+      }
+    });
+    document.getElementById('closeDepositEdit').addEventListener('click', closeDepositEditor);
+    document.getElementById('depositEditModal').addEventListener('click', (event) => {
+      if (event.target.id === 'depositEditModal') closeDepositEditor();
+    });
+    document.getElementById('depositEditForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const form = event.currentTarget;
+      if (!form.reportValidity()) return;
+      const errorMessage = document.getElementById('depositEditError');
+      const id = document.getElementById('editDepositId').value;
+      try {
+        const deposits = loadDeposits();
+        const index = deposits.findIndex((deposit) => deposit.id === id);
+        if (index < 0) throw new Error('Obat ini sudah tidak ada di daftar setoran.');
+        deposits[index] = {
+          ...deposits[index],
+          name: document.getElementById('editDepositName').value.trim(),
+          barcode: document.getElementById('editDepositBarcode').value.trim(),
+          strength: document.getElementById('editDepositStrength').value.trim(),
+          formType: document.getElementById('editDepositFormType').value.trim(),
+          ingredient: document.getElementById('editDepositIngredient').value.trim(),
+          manufacturer: document.getElementById('editDepositManufacturer').value.trim(),
+          expiry: document.getElementById('editDepositExpiry').value,
+          quantity: document.getElementById('editDepositQuantity').value.trim(),
+          depositCount: Number(document.getElementById('editDepositCount').value),
+          condition: document.getElementById('editDepositCondition').value,
+          batch: document.getElementById('editDepositBatch').value.trim()
+        };
+        localStorage.setItem(storageKey, JSON.stringify(deposits));
+        closeDepositEditor();
+        renderSavedDeposits();
+      } catch (error) {
+        errorMessage.textContent = `Perubahan tidak dapat disimpan: ${error.message}`;
+        errorMessage.hidden = false;
+      }
     });
     document.getElementById('closeScanner').addEventListener('click', closeScanner);
     document.querySelectorAll('.scan-mode').forEach((button) => {
       button.addEventListener('click', () => setMode(button.dataset.mode));
     });
     document.getElementById('choosePhoto').addEventListener('click', () => photoInput.click());
+    document.getElementById('manualPhotoButton').addEventListener('click', () => photoInput.click());
+    captureOcrPhoto.addEventListener('click', async () => {
+      if (!cameraStream || cameraPreview.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) {
+        setCameraStatus('Kamera belum siap. Izinkan akses kamera atau unggah foto kemasan.');
+        return;
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = cameraPreview.videoWidth;
+      canvas.height = cameraPreview.videoHeight;
+      if (!canvas.width || !canvas.height) {
+        setCameraStatus('Gambar kamera belum siap. Coba lagi atau unggah foto kemasan.');
+        return;
+      }
+      canvas.getContext('2d').drawImage(cameraPreview, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob(async (blob) => {
+        if (!blob) {
+          setCameraStatus('Foto kamera gagal diproses. Coba lagi atau unggah foto kemasan.');
+          return;
+        }
+        await processPhotoFile(new File([blob], `pharvia-scan-${Date.now()}.jpg`, { type: 'image/jpeg' }));
+      }, 'image/jpeg', 0.92);
+    });
     document.getElementById('editRecognizedMedicine').addEventListener('click', () => {
       medicineForm.hidden = !medicineForm.hidden;
       if (!medicineForm.hidden) {
@@ -1411,12 +1542,10 @@ tailwind.config = {
       });
     });
 
-    photoInput.addEventListener('change', async () => {
-      const file = photoInput.files?.[0];
+    const processPhotoFile = async (file) => {
       if (!file) {
         return;
       }
-      photoInput.value = '';
       if (!file.type.startsWith('image/')) {
         setCameraStatus('Pilih file gambar seperti JPG, PNG, atau WEBP.');
         return;
@@ -1425,7 +1554,7 @@ tailwind.config = {
         setCameraStatus('Ukuran gambar maksimal 12 MB. Kompres gambar atau pilih foto lain.');
         return;
       }
-      if (scanMode !== 'package') await setMode('package');
+      if (scanMode === 'barcode') await setMode('package');
       if (photoUrl) {
         URL.revokeObjectURL(photoUrl);
       }
@@ -1433,6 +1562,8 @@ tailwind.config = {
       capturedPreview.src = photoUrl;
       capturedPreview.classList.remove('hidden');
       stopCamera();
+      captureOcrPhoto.classList.add('hidden');
+      captureOcrPhoto.classList.remove('flex');
       cameraPreview.classList.add('hidden');
       document.getElementById('addRecognizedMedicine').disabled = false;
       document.getElementById('addRecognizedMedicine').querySelector('span:last-child').textContent = 'Tambahkan ke Setoran (+20 Poin)';
@@ -1448,13 +1579,14 @@ tailwind.config = {
       recognitionResult.hidden = true;
       resultStatus.hidden = true;
       setFormMessage('');
-      try {
-        await recognizePhoto(file);
-      } catch (error) {
-        console.error('Tidak dapat menganalisis foto obat:', error);
-        setCameraStatus(`Foto gagal dianalisis: ${error.message}`);
-        revealForm('Analisis foto gagal. Isi data obat secara manual dengan melihat kemasan asli.');
-      }
+      applyDemoPanadol('', scanMode === 'manual');
+      setCameraStatus('Mode demo aktif: data contoh Panadol sudah siap ditambahkan ke Setoran.');
+    };
+
+    photoInput.addEventListener('change', async () => {
+      const file = photoInput.files?.[0];
+      photoInput.value = '';
+      await processPhotoFile(file);
     });
 
     document.getElementById('flashToggle').addEventListener('click', async (event) => {
@@ -1485,7 +1617,7 @@ tailwind.config = {
         return;
       }
       const deposit = {
-        id: `PHV-${Date.now().toString().slice(-6)}`,
+        id: `PHV-${Date.now().toString(36).toUpperCase()}`,
         name: document.getElementById('medicineName').value.trim(),
         barcode: document.getElementById('medicineBarcode').value.trim(),
         strength: document.getElementById('medicineStrength').value.trim(),
@@ -1497,6 +1629,7 @@ tailwind.config = {
         depositCount: Number(document.getElementById('medicineDepositCount').value),
         batch: document.getElementById('medicineBatch').value.trim(),
         condition: document.getElementById('medicineCondition').value,
+        isDemo: Boolean(recognizedMedicine?.isDemo),
         createdAt: new Date().toISOString()
       };
       if (!deposit.name || !deposit.expiry || !Number.isInteger(deposit.depositCount) || deposit.depositCount < 1) {
@@ -1507,8 +1640,7 @@ tailwind.config = {
         const deposits = loadDeposits();
         deposits.unshift(deposit);
         localStorage.setItem(storageKey, JSON.stringify(deposits));
-        addDepositCard(deposit);
-        document.getElementById('depositCount').textContent = `Semua (${deposits.length + 1})`;
+        renderSavedDeposits();
         recognizedMedicine = deposit;
         document.getElementById('recognitionState').textContent = 'Obat berhasil ditambahkan ke setoran';
         document.getElementById('addRecognizedMedicine').disabled = true;
@@ -1533,6 +1665,10 @@ tailwind.config = {
     });
 
     document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !document.getElementById('depositEditModal').hidden) {
+        closeDepositEditor();
+        return;
+      }
       if (event.key === 'Escape' && !scannerScreen.hidden) {
         closeScanner();
       }
