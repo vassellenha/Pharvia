@@ -1106,6 +1106,13 @@ tailwind.config = {
   </div>
 </div>
 
+<div id="imageLightbox" class="fixed inset-0 z-[110] flex items-center justify-center bg-black/85 p-5" role="dialog" aria-label="Pratinjau foto" hidden>
+  <button id="closeImageLightbox" type="button" aria-label="Tutup pratinjau foto" class="absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-md active:scale-95 transition-transform">
+    <span class="material-symbols-outlined">close</span>
+  </button>
+  <img id="imageLightboxImg" class="max-h-full max-w-full rounded-2xl object-contain shadow-2xl" alt="Pratinjau foto">
+</div>
+
 <section id="profileScreen" class="flex w-full flex-col pb-28 px-margin" aria-label="Profil saya" hidden>
   <section class="w-full bg-surface-container-lowest rounded-xl shadow-[0_4px_16px_-2px_rgba(15,76,129,0.06),0_2px_6px_-1px_rgba(15,76,129,0.03)] p-margin mt-space-md">
     <div class="flex items-start justify-between gap-space-sm">
@@ -1945,9 +1952,10 @@ tailwind.config = {
       image.className = 'flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-surface-container text-secondary';
       if (deposit.imageDataUrl) {
         const thumbnail = document.createElement('img');
-        thumbnail.className = 'h-full w-full object-cover';
+        thumbnail.className = 'h-full w-full object-cover cursor-pointer';
         thumbnail.src = deposit.imageDataUrl;
         thumbnail.alt = `Foto ${deposit.name}`;
+        thumbnail.addEventListener('click', () => openImageLightbox(deposit.imageDataUrl, `Foto ${deposit.name}`));
         image.append(thumbnail);
       } else {
         const icon = document.createElement('span');
@@ -1993,9 +2001,10 @@ tailwind.config = {
       image.className = 'flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-surface-container text-secondary';
       if (deposit.imageDataUrl) {
         const thumbnail = document.createElement('img');
-        thumbnail.className = 'h-full w-full object-cover';
+        thumbnail.className = 'h-full w-full object-cover cursor-pointer';
         thumbnail.src = deposit.imageDataUrl;
         thumbnail.alt = `Foto ${deposit.name}`;
+        thumbnail.addEventListener('click', () => openImageLightbox(deposit.imageDataUrl, `Foto ${deposit.name}`));
         image.append(thumbnail);
       } else {
         const icon = document.createElement('span');
@@ -2499,6 +2508,29 @@ tailwind.config = {
       });
     });
 
+    const openImageLightbox = (src, alt) => {
+      if (!src) return;
+      const modal = document.getElementById('imageLightbox');
+      const img = document.getElementById('imageLightboxImg');
+      img.src = src;
+      img.alt = alt || 'Pratinjau foto';
+      modal.hidden = false;
+      document.body.style.overflow = 'hidden';
+    };
+
+    const closeImageLightbox = () => {
+      const modal = document.getElementById('imageLightbox');
+      if (modal.hidden) return;
+      modal.hidden = true;
+      document.body.style.overflow = '';
+      document.getElementById('imageLightboxImg').src = '';
+    };
+
+    document.getElementById('closeImageLightbox').addEventListener('click', closeImageLightbox);
+    document.getElementById('imageLightbox').addEventListener('click', (event) => {
+      if (event.target.id === 'imageLightbox') closeImageLightbox();
+    });
+
     const closeActivityDetail = () => {
       const modal = document.getElementById('activityDetailModal');
       if (!modal || modal.hidden) return;
@@ -2512,9 +2544,12 @@ tailwind.config = {
 
       const avatarEl = document.getElementById('activityDetailAvatar');
       avatarEl.innerHTML = entry.imageDataUrl
-        ? `<img src="${entry.imageDataUrl}" alt="Foto ${escapeHtml(entry.title)}" class="h-full w-full object-cover">`
+        ? `<img src="${entry.imageDataUrl}" alt="Foto ${escapeHtml(entry.title)}" class="h-full w-full object-cover cursor-pointer">`
         : `<span class="material-symbols-outlined text-[28px]${isPending ? ' animate-spin' : ''}"${isPending ? ' style="animation-duration: 6s;"' : ''}>${entry.icon}</span>`;
       avatarEl.className = `relative w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 ${entry.imageDataUrl ? 'overflow-hidden bg-surface-container' : entry.iconClasses}`;
+      if (entry.imageDataUrl) {
+        avatarEl.querySelector('img').addEventListener('click', () => openImageLightbox(entry.imageDataUrl, `Foto ${entry.title}`));
+      }
 
       document.getElementById('activityDetailTitle').textContent = entry.title;
       document.getElementById('activityDetailSubtitle').textContent = entry.subtitle;
@@ -3643,6 +3678,10 @@ tailwind.config = {
       }
       if (event.key === 'Escape' && !document.getElementById('activityDetailModal').hidden) {
         closeActivityDetail();
+        return;
+      }
+      if (event.key === 'Escape' && !document.getElementById('imageLightbox').hidden) {
+        closeImageLightbox();
         return;
       }
       if (event.key === 'Escape' && !scannerScreen.hidden) {
