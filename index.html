@@ -427,7 +427,7 @@ tailwind.config = {
           <span class="material-symbols-outlined text-[16px] text-secondary-container" style="font-variation-settings: 'FILL' 1;">stars</span>
           <span class="font-label-sm text-label-sm">Pharvia Points</span>
         </div>
-        <span class="font-headline-sm text-headline-sm font-extrabold text-primary mt-1">720 <span class="font-body-sm text-body-sm font-medium text-outline">pts</span></span>
+        <span class="font-headline-sm text-headline-sm font-extrabold text-primary mt-1"><span id="homePointsStat">720</span> <span class="font-body-sm text-body-sm font-medium text-outline">pts</span></span>
       </div>
     </div>
     <div class="mt-space-md pt-space-xs flex justify-end">
@@ -451,7 +451,7 @@ tailwind.config = {
       <div class="min-w-0">
         <span class="inline-flex items-center gap-1.5 rounded-full bg-on-primary/10 backdrop-blur-md px-2.5 py-1 font-label-sm text-label-sm text-secondary-fixed">
           <span class="material-symbols-outlined text-[14px]">stars</span>
-          720 Eco-Points Aktif
+          <span id="homeRewardPoints">720</span> Eco-Points Aktif
         </span>
         <h4 class="mt-2 font-headline-md text-headline-md font-bold leading-tight text-surface-container-lowest">Tukarkan Poin Kamu</h4>
         <p class="mt-1 font-body-sm text-body-sm text-primary-fixed opacity-90">Voucher apotek, donasi lingkungan &amp; produk eco menanti.</p>
@@ -712,6 +712,11 @@ tailwind.config = {
     <p class="mt-0.5 font-body-md text-body-md text-on-surface-variant">Tukarkan poin kontribusi kelola obat sisa dengan reward ramah lingkungan &amp; kesehatan.</p>
   </div>
 
+  <div id="rewardToast" class="mx-margin mt-1 hidden items-center gap-2.5 rounded-xl p-3 font-body-sm text-body-sm shadow-sm" role="status" aria-live="polite">
+    <span id="rewardToastIcon" class="material-symbols-outlined text-[20px]"></span>
+    <span id="rewardToastMessage" class="min-w-0 flex-1"></span>
+  </div>
+
   <div class="px-margin pt-space-sm">
     <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary-container via-primary to-secondary p-space-lg text-on-primary shadow-xl">
       <div class="absolute -right-10 -bottom-10 w-44 h-44 rounded-full bg-secondary-container/20 blur-2xl pointer-events-none"></div>
@@ -722,13 +727,13 @@ tailwind.config = {
             <span class="material-symbols-outlined text-[18px] text-tertiary-fixed">stars</span>
             Eco-Points Aktif
           </span>
-          <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-on-primary/10 backdrop-blur-md font-label-sm text-label-sm text-secondary-fixed">
+          <span id="rewardsLevelBadge" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-on-primary/10 backdrop-blur-md font-label-sm text-label-sm text-secondary-fixed">
             <span class="material-symbols-outlined text-[14px]">verified</span>
             Level 2: Eco Guardian
           </span>
         </div>
         <div class="flex items-baseline gap-2">
-          <span class="font-headline-xl-mobile text-headline-xl-mobile text-on-primary font-extrabold tracking-tight">720</span>
+          <span id="rewardsPointsBalance" class="font-headline-xl-mobile text-headline-xl-mobile text-on-primary font-extrabold tracking-tight">720</span>
           <span class="font-headline-sm text-headline-sm text-secondary-fixed font-semibold">Poin</span>
         </div>
         <div class="flex items-center gap-2 p-2.5 rounded-lg bg-surface-container-lowest/10 backdrop-blur-sm">
@@ -740,14 +745,14 @@ tailwind.config = {
         <div class="flex flex-col gap-1.5 pt-1">
           <div class="flex justify-between items-center font-label-sm text-label-sm">
             <span class="text-on-primary-container">Progress ke Pharvia Hero</span>
-            <span class="text-on-primary font-bold">+280 Poin lagi</span>
+            <span id="rewardsProgressRemaining" class="text-on-primary font-bold">+280 Poin lagi</span>
           </div>
           <div class="w-full h-2 rounded-full bg-on-primary/20 overflow-hidden">
-            <div class="h-full rounded-full bg-gradient-to-r from-secondary-fixed-dim to-tertiary-fixed w-[72%] transition-all duration-500"></div>
+            <div id="rewardsProgressBar" class="h-full rounded-full bg-gradient-to-r from-secondary-fixed-dim to-tertiary-fixed w-[72%] transition-all duration-500"></div>
           </div>
           <div class="flex justify-between font-label-sm text-label-sm text-on-primary-container/80 text-[10px]">
-            <span>720 Poin</span>
-            <span>Target 1.000 Poin</span>
+            <span id="rewardsProgressCurrent">720 Poin</span>
+            <span id="rewardsProgressTarget">Target 1.000 Poin</span>
           </div>
         </div>
         <div class="grid grid-cols-2 gap-2.5 pt-2">
@@ -827,8 +832,8 @@ tailwind.config = {
                 <span class="material-symbols-outlined text-[18px]">nest_eco_leaf</span>
                 <span>150 Poin</span>
               </div>
-              <button type="button" class="h-8 px-4 rounded-full bg-primary hover:bg-primary-container text-on-primary font-label-sm text-label-sm active:scale-95 transition-all shadow-sm flex items-center gap-1">
-                <span>Tukarkan</span>
+              <button type="button" class="redeem-reward-btn h-8 px-4 rounded-full bg-primary hover:bg-primary-container text-on-primary font-label-sm text-label-sm active:scale-95 transition-all shadow-sm flex items-center gap-1" data-reward-id="mangrove" data-reward-cost="150" data-reward-name="Tanam 1 Bibit Mangrove" data-reward-icon="forest">
+                <span class="redeem-reward-btn-label">Tukarkan</span>
                 <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
               </button>
             </div>
@@ -856,8 +861,8 @@ tailwind.config = {
                 <span class="material-symbols-outlined text-[18px]">nest_eco_leaf</span>
                 <span>200 Poin</span>
               </div>
-              <button type="button" class="h-8 px-4 rounded-full bg-primary hover:bg-primary-container text-on-primary font-label-sm text-label-sm active:scale-95 transition-all shadow-sm flex items-center gap-1">
-                <span>Tukarkan</span>
+              <button type="button" class="redeem-reward-btn h-8 px-4 rounded-full bg-primary hover:bg-primary-container text-on-primary font-label-sm text-label-sm active:scale-95 transition-all shadow-sm flex items-center gap-1" data-reward-id="voucher-25k" data-reward-cost="200" data-reward-name="Voucher Apotek Rp25.000" data-reward-icon="local_pharmacy">
+                <span class="redeem-reward-btn-label">Tukarkan</span>
                 <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
               </button>
             </div>
@@ -885,8 +890,8 @@ tailwind.config = {
                 <span class="material-symbols-outlined text-[18px]">nest_eco_leaf</span>
                 <span>120 Poin</span>
               </div>
-              <button type="button" class="h-8 px-4 rounded-full bg-primary hover:bg-primary-container text-on-primary font-label-sm text-label-sm active:scale-95 transition-all shadow-sm flex items-center gap-1">
-                <span>Tukarkan</span>
+              <button type="button" class="redeem-reward-btn h-8 px-4 rounded-full bg-primary hover:bg-primary-container text-on-primary font-label-sm text-label-sm active:scale-95 transition-all shadow-sm flex items-center gap-1" data-reward-id="eco-bath" data-reward-cost="120" data-reward-name="Diskon 20% Eco-Bath" data-reward-icon="spa">
+                <span class="redeem-reward-btn-label">Tukarkan</span>
                 <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
               </button>
             </div>
@@ -914,8 +919,8 @@ tailwind.config = {
                 <span class="material-symbols-outlined text-[18px]">nest_eco_leaf</span>
                 <span>300 Poin</span>
               </div>
-              <button type="button" class="h-8 px-4 rounded-full bg-primary hover:bg-primary-container text-on-primary font-label-sm text-label-sm active:scale-95 transition-all shadow-sm flex items-center gap-1">
-                <span>Tukarkan</span>
+              <button type="button" class="redeem-reward-btn h-8 px-4 rounded-full bg-primary hover:bg-primary-container text-on-primary font-label-sm text-label-sm active:scale-95 transition-all shadow-sm flex items-center gap-1" data-reward-id="sanitasi-air" data-reward-cost="300" data-reward-name="Sanitasi Air Komunitas" data-reward-icon="clean_hands">
+                <span class="redeem-reward-btn-label">Tukarkan</span>
                 <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
               </button>
             </div>
@@ -947,43 +952,7 @@ tailwind.config = {
         <span class="material-symbols-outlined text-[16px]">chevron_right</span>
       </a>
     </div>
-    <div class="flex flex-col gap-2">
-      <div class="flex items-center justify-between p-3.5 rounded-xl bg-surface-container-lowest shadow-sm">
-        <div class="flex items-center gap-3 min-w-0">
-          <div class="w-10 h-10 rounded-full bg-tertiary-container/20 text-tertiary flex items-center justify-center shrink-0">
-            <span class="material-symbols-outlined text-[20px]">arrow_downward</span>
-          </div>
-          <div class="flex flex-col min-w-0">
-            <span class="font-label-md text-label-md text-on-surface truncate font-semibold">Setoran Obat #PHV-10293</span>
-            <span class="font-body-sm text-body-sm text-on-surface-variant truncate">Kimia Farma Cikarang • Kemarin, 14:20</span>
-          </div>
-        </div>
-        <span class="font-label-lg text-label-lg font-bold text-tertiary shrink-0">+60 Poin</span>
-      </div>
-      <div class="flex items-center justify-between p-3.5 rounded-xl bg-surface-container-lowest shadow-sm">
-        <div class="flex items-center gap-3 min-w-0">
-          <div class="w-10 h-10 rounded-full bg-secondary-container/40 text-secondary flex items-center justify-center shrink-0">
-            <span class="material-symbols-outlined text-[20px]">qr_code_scanner</span>
-          </div>
-          <div class="flex flex-col min-w-0">
-            <span class="font-label-md text-label-md text-on-surface truncate font-semibold">Scan Obat Kadaluwarsa</span>
-            <span class="font-body-sm text-body-sm text-on-surface-variant truncate">Paracetamol 500mg • 2 Okt 2026</span>
-          </div>
-        </div>
-        <span class="font-label-lg text-label-lg font-bold text-secondary shrink-0">+20 Poin</span>
-      </div>
-      <div class="flex items-center justify-between p-3.5 rounded-xl bg-surface-container-lowest shadow-sm">
-        <div class="flex items-center gap-3 min-w-0">
-          <div class="w-10 h-10 rounded-full bg-surface-container text-on-surface-variant flex items-center justify-center shrink-0">
-            <span class="material-symbols-outlined text-[20px]">arrow_upward</span>
-          </div>
-          <div class="flex flex-col min-w-0">
-            <span class="font-label-md text-label-md text-on-surface truncate font-semibold">Donasi 1 Bibit Mangrove</span>
-            <span class="font-body-sm text-body-sm text-on-surface-variant truncate">LindungiHutan • 28 Sep 2026</span>
-          </div>
-        </div>
-        <span class="font-label-lg text-label-lg font-bold text-on-surface-variant shrink-0">-150 Poin</span>
-      </div>
+    <div id="rewardsHistoryList" class="flex flex-col gap-2"></div>
     </div>
   </div>
 </section>
@@ -1615,6 +1584,151 @@ tailwind.config = {
       document.getElementById('depositFooterWeight').lastChild.textContent = `Est. ${estimatedWeight.toFixed(1)} kg`;
     };
 
+    const POINTS_BASELINE = 130;
+    const POINTS_PER_DEPOSIT_ITEM = 20;
+    const redemptionsStorageKey = 'pharvia.ecoPoints.redemptions';
+    const rewardsHistorySeed = [
+      { id: 'seed-setoran', title: 'Setoran Obat #PHV-10293', subtitle: 'Kimia Farma Cikarang • Kemarin, 14:20', points: 60, icon: 'arrow_downward', iconClasses: 'bg-tertiary-container/20 text-tertiary' },
+      { id: 'seed-scan', title: 'Scan Obat Kadaluwarsa', subtitle: 'Paracetamol 500mg • 2 Okt 2026', points: 20, icon: 'qr_code_scanner', iconClasses: 'bg-secondary-container/40 text-secondary' },
+      { id: 'seed-donasi', title: 'Donasi 1 Bibit Mangrove', subtitle: 'LindungiHutan • 28 Sep 2026', points: -150, icon: 'arrow_upward', iconClasses: 'bg-surface-container text-on-surface-variant' }
+    ];
+
+    const loadRedemptions = () => {
+      try {
+        const saved = localStorage.getItem(redemptionsStorageKey);
+        const redemptions = saved ? JSON.parse(saved) : [];
+        return Array.isArray(redemptions) ? redemptions : [];
+      } catch (error) {
+        console.error('Tidak dapat memuat riwayat penukaran:', error);
+        return [];
+      }
+    };
+
+    const getDepositEarnedPoints = () => {
+      try {
+        return loadDeposits().reduce((total, deposit) => total + Number(deposit.depositCount || 1) * POINTS_PER_DEPOSIT_ITEM, 0);
+      } catch (error) {
+        return 0;
+      }
+    };
+
+    const getRedeemedPoints = () => loadRedemptions().reduce((total, redemption) => total + Number(redemption.cost || 0), 0);
+
+    const getTotalPoints = () => Math.max(0, POINTS_BASELINE + getDepositEarnedPoints() - getRedeemedPoints());
+
+    const getEcoLevel = (points) => {
+      if (points >= 1000) return { label: 'Level 3: Eco Champion', nextTarget: 2000 };
+      if (points >= 400) return { label: 'Level 2: Eco Guardian', nextTarget: 1000 };
+      return { label: 'Level 1: Eco Starter', nextTarget: 400 };
+    };
+
+    const showRewardToast = (message, variant = 'success') => {
+      const toast = document.getElementById('rewardToast');
+      const icon = document.getElementById('rewardToastIcon');
+      const text = document.getElementById('rewardToastMessage');
+      if (!toast) return;
+      toast.classList.remove('hidden');
+      toast.classList.add('flex');
+      toast.classList.toggle('bg-secondary-container/40', variant === 'success');
+      toast.classList.toggle('text-on-secondary-container', variant === 'success');
+      toast.classList.toggle('bg-error-container', variant === 'error');
+      toast.classList.toggle('text-on-error-container', variant === 'error');
+      icon.textContent = variant === 'success' ? 'check_circle' : 'error';
+      text.textContent = message;
+      window.clearTimeout(showRewardToast.timer);
+      showRewardToast.timer = window.setTimeout(() => {
+        toast.classList.add('hidden');
+        toast.classList.remove('flex');
+      }, 3200);
+    };
+
+    const renderRewardsHistory = () => {
+      const list = document.getElementById('rewardsHistoryList');
+      if (!list) return;
+      const redemptionEntries = loadRedemptions().map((redemption) => ({
+        id: redemption.id,
+        title: redemption.name,
+        subtitle: redemption.date,
+        points: -redemption.cost,
+        icon: redemption.icon || 'redeem',
+        iconClasses: 'bg-surface-container text-on-surface-variant'
+      })).reverse();
+      const entries = [...redemptionEntries, ...rewardsHistorySeed];
+      list.innerHTML = entries.map((entry) => `
+        <div class="flex items-center justify-between p-3.5 rounded-xl bg-surface-container-lowest shadow-sm">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-10 h-10 rounded-full ${entry.iconClasses} flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-[20px]">${entry.icon}</span>
+            </div>
+            <div class="flex flex-col min-w-0">
+              <span class="font-label-md text-label-md text-on-surface truncate font-semibold">${entry.title}</span>
+              <span class="font-body-sm text-body-sm text-on-surface-variant truncate">${entry.subtitle}</span>
+            </div>
+          </div>
+          <span class="font-label-lg text-label-lg font-bold ${entry.points < 0 ? 'text-on-surface-variant' : 'text-tertiary'} shrink-0">${entry.points < 0 ? '' : '+'}${entry.points} Poin</span>
+        </div>
+      `).join('');
+    };
+
+    const renderPointsUI = () => {
+      const totalPoints = getTotalPoints();
+      const level = getEcoLevel(totalPoints);
+      const remaining = Math.max(0, level.nextTarget - totalPoints);
+      const progressPercent = Math.min(100, Math.round((totalPoints / level.nextTarget) * 100));
+
+      document.querySelectorAll('#homePointsStat, #homeRewardPoints, #rewardsPointsBalance').forEach((el) => {
+        if (el) el.textContent = totalPoints;
+      });
+      const levelBadge = document.getElementById('rewardsLevelBadge');
+      if (levelBadge) levelBadge.lastChild.textContent = level.label;
+      const progressBar = document.getElementById('rewardsProgressBar');
+      if (progressBar) progressBar.style.width = `${progressPercent}%`;
+      const remainingLabel = document.getElementById('rewardsProgressRemaining');
+      if (remainingLabel) remainingLabel.textContent = remaining > 0 ? `+${remaining} Poin lagi` : 'Level tercapai!';
+      const currentLabel = document.getElementById('rewardsProgressCurrent');
+      if (currentLabel) currentLabel.textContent = `${totalPoints} Poin`;
+      const targetLabel = document.getElementById('rewardsProgressTarget');
+      if (targetLabel) targetLabel.textContent = `Target ${level.nextTarget.toLocaleString('id-ID')} Poin`;
+
+      document.querySelectorAll('.redeem-reward-btn').forEach((button) => {
+        const cost = Number(button.dataset.rewardCost || 0);
+        const affordable = totalPoints >= cost;
+        button.classList.toggle('opacity-50', !affordable);
+        button.title = affordable ? '' : `Kurang ${cost - totalPoints} Poin lagi`;
+      });
+
+      renderRewardsHistory();
+    };
+
+    const redeemReward = (button) => {
+      const cost = Number(button.dataset.rewardCost || 0);
+      const name = button.dataset.rewardName || 'Reward';
+      const icon = button.dataset.rewardIcon || 'redeem';
+      const totalPoints = getTotalPoints();
+      if (totalPoints < cost) {
+        showRewardToast(`Poin kamu belum cukup. Kurang ${cost - totalPoints} Poin lagi untuk menukar "${name}".`, 'error');
+        return;
+      }
+      const redemptions = loadRedemptions();
+      redemptions.push({
+        id: `redeem-${Date.now()}`,
+        rewardId: button.dataset.rewardId || '',
+        name,
+        cost,
+        icon,
+        date: new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date())
+      });
+      localStorage.setItem(redemptionsStorageKey, JSON.stringify(redemptions));
+      showRewardToast(`Berhasil menukar "${name}" dengan ${cost} Poin!`, 'success');
+      renderPointsUI();
+    };
+
+    document.getElementById('rewardsScreen').addEventListener('click', (event) => {
+      const button = event.target.closest('.redeem-reward-btn');
+      if (!button) return;
+      redeemReward(button);
+    });
+
     const renderSavedDeposits = () => {
       try {
         const deposits = loadDeposits();
@@ -1624,6 +1738,7 @@ tailwind.config = {
         deposits.forEach(addDepositCard);
         document.getElementById('depositCount').textContent = `Semua (${deposits.length + 1})`;
         renderDepositScreen(deposits);
+        renderPointsUI();
       } catch (error) {
         console.error('Tidak dapat memuat setoran hasil scan:', error);
         const pageError = document.getElementById('depositPageError');
