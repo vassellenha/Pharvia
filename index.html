@@ -1081,6 +1081,31 @@ tailwind.config = {
   </div>
 </section>
 
+<div id="activityDetailModal" class="fixed inset-0 z-[90] flex items-end justify-center bg-black/50 p-0 sm:items-center sm:p-4" hidden>
+  <div class="w-full max-w-[420px] max-h-[88dvh] overflow-y-auto rounded-t-[28px] bg-surface-container-lowest p-5 shadow-2xl sm:rounded-2xl">
+    <div class="mb-4 flex items-center justify-between">
+      <h2 class="font-headline-sm text-headline-sm font-bold text-primary">Detail Aktivitas</h2>
+      <button id="closeActivityDetail" type="button" aria-label="Tutup detail" class="flex h-10 w-10 items-center justify-center rounded-full bg-surface-container">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <div class="flex items-center gap-3 mb-4">
+      <div id="activityDetailAvatar" class="relative w-16 h-16 rounded-2xl overflow-hidden bg-surface-container flex items-center justify-center shrink-0"></div>
+      <div class="min-w-0 flex-1">
+        <h3 id="activityDetailTitle" class="font-headline-sm text-headline-sm font-bold text-primary truncate"></h3>
+        <p id="activityDetailSubtitle" class="font-body-sm text-body-sm text-on-surface-variant truncate"></p>
+        <p id="activityDetailDate" class="font-label-sm text-label-sm text-outline mt-0.5"></p>
+      </div>
+    </div>
+    <div class="flex items-center justify-between p-3.5 rounded-xl bg-surface-container-low mb-4">
+      <span id="activityDetailStatusBadge" class="px-2.5 py-1 rounded-full font-label-sm text-label-sm font-bold"></span>
+      <span id="activityDetailPoints" class="font-headline-sm text-headline-sm font-bold"></span>
+    </div>
+    <div id="activityDetailFields" class="flex flex-col gap-2 mb-2"></div>
+    <div id="activityDetailActions" class="mt-4 flex flex-col gap-2"></div>
+  </div>
+</div>
+
 <section id="profileScreen" class="flex w-full flex-col pb-28 px-margin" aria-label="Profil saya" hidden>
   <section class="w-full bg-surface-container-lowest rounded-xl shadow-[0_4px_16px_-2px_rgba(15,76,129,0.06),0_2px_6px_-1px_rgba(15,76,129,0.03)] p-margin mt-space-md">
     <div class="flex items-start justify-between gap-space-sm">
@@ -2230,6 +2255,7 @@ tailwind.config = {
     const ACTIVITY_STAT_BASELINE_KG = 1.2;
     const ACTIVITY_CUMULATIVE_BASELINE_KG = 3.4;
     let activityFilter = 'all';
+    let lastActivityEntries = [];
 
     const activitySeed = [
       { id: 'seed-proses-1', category: 'deposit', status: 'diproses', title: 'Setoran #PHV-10310', subtitle: 'Drop-Box Kimia Farma Cikarang', detail: 'Pemeriksaan kemasan', daysAgo: 0, points: 50, icon: 'sync', iconClasses: 'bg-amber-500/10 text-amber-700' },
@@ -2257,7 +2283,19 @@ tailwind.config = {
           icon: 'sync',
           iconClasses: 'bg-amber-500/10 text-amber-700',
           imageDataUrl: deposit.imageDataUrl || '',
-          timestamp: deposit.createdAt ? new Date(deposit.createdAt).getTime() : now
+          timestamp: deposit.createdAt ? new Date(deposit.createdAt).getTime() : now,
+          fields: [
+            { label: 'Nama Obat', value: [deposit.name, deposit.strength].filter(Boolean).join(' ') },
+            { label: 'Bentuk', value: deposit.formType },
+            { label: 'Isi Kemasan', value: deposit.quantity },
+            { label: 'Jumlah Disetor', value: deposit.depositCount ? `${deposit.depositCount} kemasan` : '' },
+            { label: 'Kandungan Aktif', value: deposit.ingredient },
+            { label: 'Produsen', value: deposit.manufacturer },
+            { label: 'Kondisi', value: deposit.condition },
+            { label: 'Kedaluwarsa', value: deposit.expiry ? formatExpiry(deposit.expiry) : '' },
+            { label: 'Nomor Batch', value: deposit.batch },
+            { label: 'Kode Barcode', value: deposit.barcode }
+          ].filter((field) => field.value)
         }));
       } catch (error) {
         pendingEntries = [];
@@ -2273,7 +2311,14 @@ tailwind.config = {
         points: -redemption.cost,
         icon: redemption.icon || 'redeem',
         iconClasses: 'bg-primary-fixed text-primary',
-        timestamp: redemption.timestamp || now
+        timestamp: redemption.timestamp || now,
+        fields: [
+          { label: 'Reward', value: redemption.name },
+          { label: 'Kategori', value: redemption.category === 'donasi' ? 'Donasi Lingkungan' : 'Voucher / Reward' },
+          { label: 'Biaya Poin', value: `${redemption.cost} Poin` },
+          { label: 'Kode Referensi', value: `PHV-RD-${String(redemption.id).replace(/\D/g, '').slice(-6).padStart(6, '0').toUpperCase()}` },
+          { label: 'Tanggal Penukaran', value: redemption.date || '' }
+        ].filter((field) => field.value)
       }));
 
       return [...pendingEntries, ...redeemEntries, ...seedEntries].sort((a, b) => b.timestamp - a.timestamp);
@@ -2350,7 +2395,7 @@ tailwind.config = {
           </div>`
         : '';
       return `
-        <div class="bg-surface-container-lowest rounded-2xl p-4 shadow-[0_4px_16px_rgba(15,76,129,0.05)] transition-transform active:scale-[0.99]">
+        <div class="activity-card cursor-pointer bg-surface-container-lowest rounded-2xl p-4 shadow-[0_4px_16px_rgba(15,76,129,0.05)] transition-transform active:scale-[0.99] hover:shadow-[0_6px_20px_rgba(15,76,129,0.09)]" data-activity-id="${entry.id}" role="button" tabindex="0">
           <div class="flex items-start justify-between gap-3">
             <div class="flex items-start gap-3 min-w-0">
               <div class="relative w-11 h-11 rounded-2xl ${entry.imageDataUrl ? 'overflow-hidden bg-surface-container' : entry.iconClasses} flex items-center justify-center shrink-0">
@@ -2363,7 +2408,10 @@ tailwind.config = {
                 <p class="font-label-sm text-label-sm text-outline mt-0.5">${formatActivityDate(entry.timestamp)}</p>
               </div>
             </div>
-            <span class="px-2.5 py-1 rounded-full ${badgeClasses} font-label-sm text-label-sm font-bold shrink-0 whitespace-nowrap">${badgeText}</span>
+            <div class="flex items-center gap-1 shrink-0">
+              <span class="px-2.5 py-1 rounded-full ${badgeClasses} font-label-sm text-label-sm font-bold whitespace-nowrap">${badgeText}</span>
+              <span class="material-symbols-outlined text-[18px] text-outline">chevron_right</span>
+            </div>
           </div>
           ${footer}
         </div>
@@ -2372,6 +2420,7 @@ tailwind.config = {
 
     const renderActivityUI = () => {
       const entries = getActivityEntries();
+      lastActivityEntries = entries;
 
       const counts = {
         all: entries.length,
@@ -2448,6 +2497,90 @@ tailwind.config = {
         });
         renderActivityUI();
       });
+    });
+
+    const closeActivityDetail = () => {
+      const modal = document.getElementById('activityDetailModal');
+      if (!modal || modal.hidden) return;
+      modal.hidden = true;
+      document.body.style.overflow = '';
+    };
+
+    const openActivityDetail = (entry) => {
+      const isPending = entry.status === 'diproses';
+      const pointsPositive = entry.points >= 0;
+
+      const avatarEl = document.getElementById('activityDetailAvatar');
+      avatarEl.innerHTML = entry.imageDataUrl
+        ? `<img src="${entry.imageDataUrl}" alt="Foto ${escapeHtml(entry.title)}" class="h-full w-full object-cover">`
+        : `<span class="material-symbols-outlined text-[28px]${isPending ? ' animate-spin' : ''}"${isPending ? ' style="animation-duration: 6s;"' : ''}>${entry.icon}</span>`;
+      avatarEl.className = `relative w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 ${entry.imageDataUrl ? 'overflow-hidden bg-surface-container' : entry.iconClasses}`;
+
+      document.getElementById('activityDetailTitle').textContent = entry.title;
+      document.getElementById('activityDetailSubtitle').textContent = entry.subtitle;
+      document.getElementById('activityDetailDate').textContent = formatActivityDate(entry.timestamp);
+
+      const statusBadge = document.getElementById('activityDetailStatusBadge');
+      statusBadge.textContent = isPending ? 'Diproses' : 'Selesai';
+      statusBadge.className = `px-2.5 py-1 rounded-full font-label-sm text-label-sm font-bold ${isPending ? 'bg-amber-100 text-amber-900' : 'bg-secondary-container/50 text-secondary'}`;
+
+      const pointsEl = document.getElementById('activityDetailPoints');
+      pointsEl.textContent = `${pointsPositive ? '+' : ''}${entry.points} Poin${isPending ? ' Estimasi' : ''}`;
+      pointsEl.className = `font-headline-sm text-headline-sm font-bold ${pointsPositive ? 'text-secondary' : 'text-on-surface-variant'}`;
+
+      const fields = entry.fields && entry.fields.length
+        ? entry.fields
+        : [
+            { label: 'Keterangan', value: entry.subtitle },
+            ...(entry.detail ? [{ label: 'Detail', value: entry.detail }] : [])
+          ];
+      document.getElementById('activityDetailFields').innerHTML = fields.map((field) => `
+        <div class="flex items-center justify-between gap-3 p-3 rounded-xl bg-surface-container-low">
+          <span class="font-label-sm text-label-sm text-on-surface-variant shrink-0">${escapeHtml(field.label)}</span>
+          <span class="font-label-md text-label-md font-semibold text-on-surface text-right truncate">${escapeHtml(field.value)}</span>
+        </div>
+      `).join('');
+
+      const actions = document.getElementById('activityDetailActions');
+      if (entry.category === 'deposit' && isPending) {
+        actions.innerHTML = `<button id="activityDetailGoDeposit" type="button" class="h-12 w-full rounded-full bg-primary font-label-lg text-label-lg font-bold text-white active:scale-95 transition-transform">Lihat di Setoran Saya</button>`;
+        document.getElementById('activityDetailGoDeposit').addEventListener('click', () => {
+          closeActivityDetail();
+          setActivePage('deposit');
+          renderSavedDeposits();
+        });
+      } else if (entry.category === 'voucher' || entry.category === 'donasi') {
+        actions.innerHTML = `<button id="activityDetailGoRewards" type="button" class="h-12 w-full rounded-full bg-primary font-label-lg text-label-lg font-bold text-white active:scale-95 transition-transform">Lihat Katalog Reward</button>`;
+        document.getElementById('activityDetailGoRewards').addEventListener('click', () => {
+          closeActivityDetail();
+          setActivePage('rewards');
+        });
+      } else {
+        actions.innerHTML = '';
+      }
+
+      const modal = document.getElementById('activityDetailModal');
+      modal.hidden = false;
+      document.body.style.overflow = 'hidden';
+    };
+
+    document.getElementById('activityFeedSections').addEventListener('click', (event) => {
+      const card = event.target.closest('.activity-card');
+      if (!card) return;
+      const entry = lastActivityEntries.find((item) => item.id === card.dataset.activityId);
+      if (entry) openActivityDetail(entry);
+    });
+    document.getElementById('activityFeedSections').addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      const card = event.target.closest('.activity-card');
+      if (!card) return;
+      event.preventDefault();
+      const entry = lastActivityEntries.find((item) => item.id === card.dataset.activityId);
+      if (entry) openActivityDetail(entry);
+    });
+    document.getElementById('closeActivityDetail').addEventListener('click', closeActivityDetail);
+    document.getElementById('activityDetailModal').addEventListener('click', (event) => {
+      if (event.target.id === 'activityDetailModal') closeActivityDetail();
     });
 
     const profileStorageKey = 'pharvia.profile';
@@ -3506,6 +3639,10 @@ tailwind.config = {
       }
       if (event.key === 'Escape' && !document.getElementById('editProfileModal').hidden) {
         closeEditProfile();
+        return;
+      }
+      if (event.key === 'Escape' && !document.getElementById('activityDetailModal').hidden) {
+        closeActivityDetail();
         return;
       }
       if (event.key === 'Escape' && !scannerScreen.hidden) {
