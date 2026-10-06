@@ -222,8 +222,8 @@ tailwind.config = {
         <span class="material-symbols-outlined text-[22px]">notifications</span>
         <span class="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-error ring-2 ring-surface-container-lowest"></span>
       </button>
-      <button aria-label="Open User Profile" class="w-11 h-11 p-1 rounded-full flex items-center justify-center hover:opacity-90 transition-opacity" type="button">
-        <img alt="Foto profil Pablo" class="w-9 h-9 rounded-full object-cover object-center ring-2 ring-surface-container-lowest shadow-[0_2px_8px_rgba(15,76,129,0.2)]" src="assets/profile-photo.jpg">
+      <button data-open-profile aria-label="Open User Profile" class="w-11 h-11 p-1 rounded-full flex items-center justify-center hover:opacity-90 transition-opacity" type="button">
+        <img id="headerProfileAvatar" alt="Foto profil Pablo" class="w-9 h-9 rounded-full object-cover object-center ring-2 ring-surface-container-lowest shadow-[0_2px_8px_rgba(15,76,129,0.2)]" src="assets/profile-photo.jpg">
       </button>
     </div>
   </div>
@@ -234,7 +234,7 @@ tailwind.config = {
 
 <section class="px-margin pt-space-md pb-space-sm flex items-center justify-between">
   <div class="flex flex-col min-w-0 pr-space-sm">
-  <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary tracking-tight truncate">Halo, Pablo</h1>
+  <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary tracking-tight truncate">Halo, <span id="homeUserName">Pablo</span></h1>
     <p class="font-body-md text-body-md text-on-surface-variant truncate mt-0.5">Ayo kelola obat yang sudah tidak kamu gunakan.</p>
   </div>
   <div class="flex items-center gap-space-xs shrink-0">
@@ -1081,6 +1081,316 @@ tailwind.config = {
   </div>
 </section>
 
+<section id="profileScreen" class="flex w-full flex-col pb-28 px-margin" aria-label="Profil saya" hidden>
+  <section class="w-full bg-surface-container-lowest rounded-xl shadow-[0_4px_16px_-2px_rgba(15,76,129,0.06),0_2px_6px_-1px_rgba(15,76,129,0.03)] p-margin mt-space-md">
+    <div class="flex items-start justify-between gap-space-sm">
+      <div class="relative flex-shrink-0">
+        <div class="w-16 h-16 rounded-full p-0.5 bg-gradient-to-tr from-secondary to-tertiary-fixed shadow-md flex items-center justify-center">
+          <img id="profileAvatarImg" class="w-full h-full rounded-full object-cover" alt="Foto profil" src="assets/profile-photo.jpg">
+        </div>
+        <div class="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-tertiary-container text-on-tertiary-container flex items-center justify-center shadow-sm">
+          <span class="material-symbols-outlined text-[15px]" style="font-variation-settings: 'FILL' 1;">eco</span>
+        </div>
+      </div>
+      <div class="flex-1 min-w-0 pl-space-xs">
+        <div class="flex items-center gap-space-xs flex-wrap">
+          <h1 id="profileName" class="font-headline-sm text-headline-sm text-primary tracking-tight font-bold truncate">Pablo</h1>
+          <span class="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-secondary-container/40 text-on-secondary-container font-label-sm text-label-sm">
+            <span class="material-symbols-outlined text-[13px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+            Terverifikasi
+          </span>
+        </div>
+        <p id="profileIdLine" class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 truncate">ID: PHV-882910 • Bergabung Jan 2026</p>
+        <div class="flex items-center gap-space-xs mt-2 flex-wrap">
+          <span id="profileLevelBadge" class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-tertiary/10 text-secondary font-label-sm text-label-sm font-semibold">🌱 Eco Guardian Lvl 2</span>
+        </div>
+      </div>
+      <button id="openEditProfile" aria-label="Edit Profile" class="flex-shrink-0 px-3 py-1.5 rounded-full bg-surface-container text-primary font-label-sm text-label-sm font-semibold flex items-center gap-1 active:scale-95 transition-transform" type="button">
+        <span class="material-symbols-outlined text-[15px]">edit</span>
+        <span>Edit</span>
+      </button>
+    </div>
+    <div class="grid grid-cols-3 gap-space-xs mt-space-md pt-space-md bg-surface-container-low/70 p-space-sm rounded-xl">
+      <button type="button" data-open-rewards class="flex flex-col items-center text-center p-space-xs">
+        <div class="flex items-center gap-1 text-primary">
+          <span id="profileEcoPoints" class="font-headline-sm text-headline-sm font-bold">130</span>
+          <span class="material-symbols-outlined text-[16px] text-secondary">stars</span>
+        </div>
+        <span class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">Eco-Points</span>
+        <span class="mt-1 font-label-sm text-label-sm text-secondary font-bold">Tukar</span>
+      </button>
+      <div class="flex flex-col items-center text-center p-space-xs">
+        <div class="flex items-center gap-1 text-primary">
+          <span id="profileWasteKg" class="font-headline-sm text-headline-sm font-bold">1.0</span>
+          <span class="font-label-sm text-label-sm font-semibold text-on-surface-variant">kg</span>
+        </div>
+        <span class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">Limbah Dicegah</span>
+        <span class="mt-1 font-label-sm text-label-sm text-tertiary-container font-semibold">Aman</span>
+      </div>
+      <button type="button" data-open-activity class="flex flex-col items-center text-center p-space-xs">
+        <div class="flex items-center gap-1 text-primary">
+          <span id="profileDepositCount" class="font-headline-sm text-headline-sm font-bold">0x</span>
+          <span class="material-symbols-outlined text-[16px] text-primary-container">recycling</span>
+        </div>
+        <span class="font-label-sm text-label-sm text-on-surface-variant mt-0.5">Setor Obat</span>
+        <span class="mt-1 font-label-sm text-label-sm text-on-surface-variant font-medium">Bulan Ini</span>
+      </button>
+    </div>
+  </section>
+
+  <section class="w-full mt-space-md rounded-xl bg-gradient-to-br from-primary-container to-secondary text-on-primary p-space-md shadow-[0_8px_20px_rgba(15,76,129,0.12)] relative overflow-hidden">
+    <div class="relative z-10 flex flex-col gap-space-xs">
+      <div class="flex items-center justify-between">
+        <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-surface-container-lowest/20 backdrop-blur-md text-on-primary font-label-sm text-label-sm font-semibold">
+          <span class="material-symbols-outlined text-[15px]" style="font-variation-settings: 'FILL' 1;">military_tech</span>
+          Peringkat #14 Jakarta Selatan
+        </div>
+        <span id="profileLevelTransition" class="font-label-sm text-label-sm text-on-primary font-bold">Lvl 1 → Lvl 2</span>
+      </div>
+      <p id="profileRankMessage" class="font-body-md text-body-md text-on-primary font-medium mt-1 leading-snug">
+        Tinggal <strong class="text-tertiary-fixed font-bold">270 poin</strong> lagi menuju <strong class="text-secondary-fixed">Eco Guardian</strong>. Dapatkan sertifikat terakreditasi &amp; voucher apotek.
+      </p>
+      <div class="w-full mt-1">
+        <div class="flex justify-between items-center font-label-sm text-label-sm text-on-primary/90 mb-1">
+          <span id="profileRankCurrent">130 Poin</span>
+          <span id="profileRankTarget">Target 400 Poin</span>
+        </div>
+        <div class="w-full h-2 rounded-full bg-surface-container-lowest/30 overflow-hidden">
+          <div id="profileRankProgressBar" class="h-full rounded-full bg-tertiary-fixed transition-all duration-700" style="width: 32%;"></div>
+        </div>
+      </div>
+      <div class="flex items-center justify-between pt-1">
+        <a class="inline-flex items-center gap-1 font-label-sm text-label-sm text-tertiary-fixed font-bold hover:underline" href="#">
+          <span>Lihat Papan Peringkat Eco</span>
+          <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+        </a>
+        <span class="font-label-sm text-label-sm text-on-primary/80">Sisa 8 Hari</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="w-full mt-space-lg">
+    <div class="flex items-center justify-between px-space-xs mb-space-xs">
+      <h2 class="font-headline-sm text-headline-sm text-primary font-bold">Aktivitas &amp; Dampak Saya</h2>
+      <span class="font-label-sm text-label-sm text-secondary font-semibold">Sirkularitas</span>
+    </div>
+    <div class="bg-surface-container-lowest rounded-xl shadow-[0_2px_12px_rgba(15,76,129,0.04)] overflow-hidden flex flex-col">
+      <button type="button" data-open-activity class="flex items-center justify-between p-space-md hover:bg-surface-container-low transition-colors text-left">
+        <div class="flex items-center gap-space-sm min-w-0">
+          <div class="w-10 h-10 rounded-full bg-secondary-container/50 text-secondary flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-[20px]">receipt_long</span>
+          </div>
+          <div class="min-w-0">
+            <div class="font-label-lg text-label-lg text-on-surface font-semibold truncate">Riwayat Setoran Obat</div>
+            <div id="profileDepositHistorySubtitle" class="font-body-sm text-body-sm text-on-surface-variant truncate">Daftar setoran &amp; verifikasi barcode digital</div>
+          </div>
+        </div>
+        <span class="material-symbols-outlined text-[20px] text-outline flex-shrink-0 pl-2">chevron_right</span>
+      </button>
+      <button type="button" data-open-rewards class="flex items-center justify-between p-space-md hover:bg-surface-container-low transition-colors text-left">
+        <div class="flex items-center gap-space-sm min-w-0">
+          <div class="w-10 h-10 rounded-full bg-primary-fixed text-primary flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-[20px]">confirmation_number</span>
+          </div>
+          <div class="min-w-0">
+            <div class="font-label-lg text-label-lg text-on-surface font-semibold truncate">Voucher &amp; Kupon Saya</div>
+            <div class="font-body-sm text-body-sm text-on-surface-variant truncate">Klaim potongan tebus obat &amp; mitra daur ulang</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 flex-shrink-0 pl-2">
+          <span id="profileVoucherCount" class="px-2 py-0.5 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-label-sm text-label-sm font-bold">0 Aktif</span>
+          <span class="material-symbols-outlined text-[20px] text-outline">chevron_right</span>
+        </div>
+      </button>
+      <button type="button" data-open-activity class="flex items-center justify-between p-space-md hover:bg-surface-container-low transition-colors text-left">
+        <div class="flex items-center gap-space-sm min-w-0">
+          <div class="w-10 h-10 rounded-full bg-tertiary-fixed-dim/40 text-tertiary flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-[20px]">workspace_premium</span>
+          </div>
+          <div class="min-w-0">
+            <div class="font-label-lg text-label-lg text-on-surface font-semibold truncate">Sertifikat Kontribusi Hijau</div>
+            <div class="font-body-sm text-body-sm text-on-surface-variant truncate">Dokumen resmi tervalidasi IAI &amp; KLHK (PDF)</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 flex-shrink-0 pl-2">
+          <span id="profileCertificateCount" class="px-2 py-0.5 rounded-full bg-secondary text-on-secondary font-label-sm text-label-sm font-bold">0 Baru</span>
+          <span class="material-symbols-outlined text-[20px] text-outline">chevron_right</span>
+        </div>
+      </button>
+      <div class="flex items-center justify-between p-space-md">
+        <div class="flex items-center gap-space-sm min-w-0">
+          <div class="w-10 h-10 rounded-full bg-surface-container text-primary flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-[20px]">insights</span>
+          </div>
+          <div class="min-w-0">
+            <div class="font-label-lg text-label-lg text-on-surface font-semibold truncate">Statistik Dampak Sirkular</div>
+            <div class="font-body-sm text-body-sm text-on-surface-variant truncate">Kalkulasi reduksi jejak karbon &amp; pencegahan cemaran</div>
+          </div>
+        </div>
+        <span class="material-symbols-outlined text-[20px] text-outline flex-shrink-0 pl-2">chevron_right</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="w-full mt-space-lg">
+    <div class="flex items-center justify-between px-space-xs mb-space-xs">
+      <h2 class="font-headline-sm text-headline-sm text-primary font-bold">Pengaturan &amp; Keamanan</h2>
+      <span class="font-label-sm text-label-sm text-on-surface-variant">Preferensi</span>
+    </div>
+    <div class="bg-surface-container-lowest rounded-xl shadow-[0_2px_12px_rgba(15,76,129,0.04)] overflow-hidden flex flex-col">
+      <div class="flex items-center justify-between p-space-md">
+        <div class="flex items-center gap-space-sm min-w-0">
+          <div class="w-10 h-10 rounded-full bg-surface-container-high text-primary flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-[20px]">badge</span>
+          </div>
+          <div class="min-w-0">
+            <div class="font-label-lg text-label-lg text-on-surface font-semibold truncate">Data Pribadi &amp; Verifikasi ID</div>
+            <div class="font-body-sm text-body-sm text-on-surface-variant truncate">NIK, data kontak, dan rekam medik aman</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-1 flex-shrink-0 pl-2">
+          <span class="font-label-sm text-label-sm text-secondary font-semibold">KTP Sah</span>
+          <span class="material-symbols-outlined text-[20px] text-outline">chevron_right</span>
+        </div>
+      </div>
+      <div class="flex items-center justify-between p-space-md">
+        <div class="flex items-center gap-space-sm min-w-0">
+          <div class="w-10 h-10 rounded-full bg-surface-container-high text-primary flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-[20px]">local_pharmacy</span>
+          </div>
+          <div class="min-w-0">
+            <div class="font-label-lg text-label-lg text-on-surface font-semibold truncate">Apotek Favorit Saya</div>
+            <div class="font-body-sm text-body-sm text-on-surface-variant truncate">Drop-point terdekat di Kebayoran &amp; Cilandak</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-1 flex-shrink-0 pl-2">
+          <span class="font-label-sm text-label-sm text-on-surface-variant">3 Apotek</span>
+          <span class="material-symbols-outlined text-[20px] text-outline">chevron_right</span>
+        </div>
+      </div>
+      <div class="flex items-center justify-between p-space-md hover:bg-surface-container-low transition-colors">
+        <div class="flex items-center gap-space-sm min-w-0">
+          <div class="w-10 h-10 rounded-full bg-surface-container-high text-primary flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-[20px]">notifications_active</span>
+          </div>
+          <div class="min-w-0">
+            <div class="font-label-lg text-label-lg text-on-surface font-semibold truncate">Pengingat Kedaluwarsa</div>
+            <div class="font-body-sm text-body-sm text-on-surface-variant truncate">Notifikasi obat kotak P3K mendekati masa ED</div>
+          </div>
+        </div>
+        <div class="flex items-center flex-shrink-0 pl-2">
+          <input id="profileExpiryReminderToggle" class="w-5 h-5 accent-secondary cursor-pointer" type="checkbox">
+        </div>
+      </div>
+      <div class="flex items-center justify-between p-space-md">
+        <div class="flex items-center gap-space-sm min-w-0">
+          <div class="w-10 h-10 rounded-full bg-surface-container-high text-primary flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-[20px]">fingerprint</span>
+          </div>
+          <div class="min-w-0">
+            <div class="font-label-lg text-label-lg text-on-surface font-semibold truncate">Keamanan &amp; Biometrik</div>
+            <div class="font-body-sm text-body-sm text-on-surface-variant truncate">PIN transaksi, Face ID / Sidik Jari</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-1 flex-shrink-0 pl-2">
+          <span class="font-label-sm text-label-sm text-secondary font-semibold">Aktif</span>
+          <span class="material-symbols-outlined text-[20px] text-outline">chevron_right</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="w-full mt-space-lg">
+    <div class="flex items-center justify-between px-space-xs mb-space-xs">
+      <h2 class="font-headline-sm text-headline-sm text-primary font-bold">Bantuan &amp; Edukasi</h2>
+      <span class="font-label-sm text-label-sm text-on-surface-variant">Pusat Info</span>
+    </div>
+    <div class="bg-surface-container-lowest rounded-xl shadow-[0_2px_12px_rgba(15,76,129,0.04)] overflow-hidden flex flex-col">
+      <div class="flex items-center justify-between p-space-md">
+        <div class="flex items-center gap-space-sm min-w-0">
+          <div class="w-10 h-10 rounded-full bg-secondary-container/40 text-secondary flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-[20px]">menu_book</span>
+          </div>
+          <div class="min-w-0">
+            <div class="font-label-lg text-label-lg text-on-surface font-semibold truncate">Panduan Pemilahan Obat Sisa</div>
+            <div class="font-body-sm text-body-sm text-on-surface-variant truncate">Standar aman pemisahan strip, sirup, &amp; injeksi</div>
+          </div>
+        </div>
+        <span class="material-symbols-outlined text-[20px] text-outline flex-shrink-0 pl-2">chevron_right</span>
+      </div>
+      <div class="flex items-center justify-between p-space-md">
+        <div class="flex items-center gap-space-sm min-w-0">
+          <div class="w-10 h-10 rounded-full bg-primary-fixed text-primary flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-[20px]">support_agent</span>
+          </div>
+          <div class="min-w-0">
+            <div class="font-label-lg text-label-lg text-on-surface font-semibold truncate">Pusat Bantuan &amp; Tanya Apoteker</div>
+            <div class="font-body-sm text-body-sm text-on-surface-variant truncate">Konsultasi interaktif &amp; FAQ drop-box</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-1 flex-shrink-0 pl-2">
+          <span class="font-label-sm text-label-sm text-tertiary-container font-semibold">Online</span>
+          <span class="material-symbols-outlined text-[20px] text-outline">chevron_right</span>
+        </div>
+      </div>
+      <div class="flex items-center justify-between p-space-md">
+        <div class="flex items-center gap-space-sm min-w-0">
+          <div class="w-10 h-10 rounded-full bg-surface-container text-on-surface-variant flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-[20px]">policy</span>
+          </div>
+          <div class="min-w-0">
+            <div class="font-label-lg text-label-lg text-on-surface font-semibold truncate">Kebijakan Privasi &amp; Ketentuan</div>
+            <div class="font-body-sm text-body-sm text-on-surface-variant truncate">Kepatuhan regulasi PDP &amp; standar limbah B3</div>
+          </div>
+        </div>
+        <span class="material-symbols-outlined text-[20px] text-outline flex-shrink-0 pl-2">chevron_right</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="w-full mt-space-xl flex flex-col items-center gap-space-md">
+    <button id="profileLogoutButton" class="w-full h-12 rounded-full bg-error-container/60 hover:bg-error-container text-error font-label-lg text-label-lg font-bold flex items-center justify-center gap-2 active:scale-[0.98] transition-all" type="button">
+      <span class="material-symbols-outlined text-[20px]">logout</span>
+      <span>Keluar dari Akun</span>
+    </button>
+    <div class="flex flex-col items-center text-center">
+      <div class="flex items-center gap-1 text-on-surface-variant font-label-sm text-label-sm">
+        <span class="font-semibold text-primary">PHARVIA Mobile</span>
+        <span>• v2.4.0 (Build 2026.10)</span>
+      </div>
+      <p class="font-body-sm text-body-sm text-outline mt-0.5">Resmi didukung oleh Kementerian Lingkungan Hidup &amp; Kehutanan dan Ikatan Apoteker Indonesia</p>
+    </div>
+  </section>
+</section>
+
+<div id="editProfileModal" class="fixed inset-0 z-[90] flex items-end justify-center bg-black/50 p-0 sm:items-center sm:p-4" hidden>
+  <form id="editProfileForm" class="w-full max-w-[420px] overflow-y-auto rounded-t-[28px] bg-surface-container-lowest p-5 shadow-2xl sm:rounded-2xl">
+    <div class="mb-4 flex items-center justify-between">
+      <h2 class="font-headline-sm text-headline-sm font-bold text-primary">Edit Profil</h2>
+      <button id="closeEditProfile" type="button" aria-label="Tutup edit profil" class="flex h-10 w-10 items-center justify-center rounded-full bg-surface-container">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <div class="flex flex-col items-center gap-2 mb-4">
+      <div class="relative w-20 h-20">
+        <img id="editProfileAvatarPreview" class="w-20 h-20 rounded-full object-cover ring-2 ring-surface-container" alt="Pratinjau foto profil" src="assets/profile-photo.jpg">
+        <button type="button" id="editProfileAvatarButton" aria-label="Ganti foto profil" class="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-white shadow-sm">
+          <span class="material-symbols-outlined text-[16px]">photo_camera</span>
+        </button>
+        <input id="editProfileAvatarInput" type="file" accept="image/*" class="hidden">
+      </div>
+      <span class="font-label-sm text-label-sm text-on-surface-variant">Ketuk ikon kamera untuk ganti foto</span>
+    </div>
+    <div class="flex flex-col gap-3">
+      <label class="flex flex-col gap-1 font-label-sm text-label-sm font-semibold text-on-surface-variant">Nama Lengkap
+        <input id="editProfileNameInput" required maxlength="60" class="h-11 rounded-xl border border-outline-variant/60 bg-white px-3 font-body-md text-on-surface outline-none focus:border-secondary">
+      </label>
+      <p id="editProfileError" class="font-body-sm text-body-sm text-error" role="alert" hidden></p>
+      <button class="mt-1 h-12 w-full rounded-full bg-primary font-label-lg text-label-lg font-bold text-white" type="submit">Simpan Perubahan</button>
+    </div>
+  </form>
+</div>
+
 <div id="depositEditModal" class="fixed inset-0 z-[80] flex items-end justify-center bg-black/50 p-0 sm:items-center sm:p-4" hidden>
   <form id="depositEditForm" class="max-h-[88dvh] w-full max-w-[480px] overflow-y-auto rounded-t-[28px] bg-surface-container-lowest p-5 shadow-2xl sm:rounded-2xl">
     <div class="mb-4 flex items-center justify-between"><h2 id="depositEditTitle" class="font-headline-sm text-headline-sm font-bold text-primary">Edit obat</h2><button id="closeDepositEdit" type="button" aria-label="Tutup edit" class="flex h-10 w-10 items-center justify-center rounded-full bg-surface-container"><span class="material-symbols-outlined">close</span></button></div>
@@ -1394,6 +1704,7 @@ tailwind.config = {
     const locationsScreen = document.getElementById('locationsScreen');
     const rewardsScreen = document.getElementById('rewardsScreen');
     const activityScreen = document.getElementById('activityScreen');
+    const profileScreen = document.getElementById('profileScreen');
     let activePage = 'home';
     let previousPage = 'home';
     const locationStorageKey = 'pharvia.selectedDropoff';
@@ -1761,9 +2072,9 @@ tailwind.config = {
     const getTotalPoints = () => Math.max(0, POINTS_BASELINE + getDepositEarnedPoints() - getRedeemedPoints());
 
     const getEcoLevel = (points) => {
-      if (points >= 1000) return { label: 'Level 3: Eco Champion', nextTarget: 2000 };
-      if (points >= 400) return { label: 'Level 2: Eco Guardian', nextTarget: 1000 };
-      return { label: 'Level 1: Eco Starter', nextTarget: 400 };
+      if (points >= 1000) return { level: 3, name: 'Eco Champion', label: 'Level 3: Eco Champion', nextTarget: 2000, nextName: null };
+      if (points >= 400) return { level: 2, name: 'Eco Guardian', label: 'Level 2: Eco Guardian', nextTarget: 1000, nextName: 'Eco Champion' };
+      return { level: 1, name: 'Eco Starter', label: 'Level 1: Eco Starter', nextTarget: 400, nextName: 'Eco Guardian' };
     };
 
     const closeRedeemModal = () => {
@@ -2117,6 +2428,131 @@ tailwind.config = {
         });
         renderActivityUI();
       });
+    });
+
+    const profileStorageKey = 'pharvia.profile';
+    const defaultProfile = { name: 'Pablo', avatarDataUrl: '', expiryReminder: true, joinedLabel: 'Jan 2026' };
+
+    const loadProfile = () => {
+      try {
+        const saved = localStorage.getItem(profileStorageKey);
+        if (!saved) return { ...defaultProfile };
+        return { ...defaultProfile, ...JSON.parse(saved) };
+      } catch (error) {
+        console.error('Tidak dapat memuat data profil:', error);
+        return { ...defaultProfile };
+      }
+    };
+
+    const saveProfile = (profile) => {
+      localStorage.setItem(profileStorageKey, JSON.stringify(profile));
+    };
+
+    const renderProfileUI = () => {
+      const profile = loadProfile();
+      const totalPoints = getTotalPoints();
+      const level = getEcoLevel(totalPoints);
+      const remaining = Math.max(0, level.nextTarget - totalPoints);
+      const progressPercent = Math.min(100, Math.round((totalPoints / level.nextTarget) * 100));
+      const pendingItemCount = getDepositEarnedPoints() / POINTS_PER_DEPOSIT_ITEM;
+      const avatarSrc = profile.avatarDataUrl || 'assets/profile-photo.jpg';
+
+      document.getElementById('homeUserName').textContent = profile.name;
+      document.getElementById('headerProfileAvatar').src = avatarSrc;
+      document.getElementById('profileAvatarImg').src = avatarSrc;
+      document.getElementById('profileName').textContent = profile.name;
+      document.getElementById('profileIdLine').textContent = `ID: PHV-882910 • Bergabung ${profile.joinedLabel}`;
+      document.getElementById('profileLevelBadge').textContent = `🌱 ${level.name} Lvl ${level.level}`;
+      document.getElementById('profileEcoPoints').textContent = totalPoints;
+
+      const weight = ACTIVITY_CUMULATIVE_BASELINE_KG + pendingItemCount * WEIGHT_PER_ITEM_KG;
+      document.getElementById('profileWasteKg').textContent = weight.toFixed(1);
+
+      const activityEntries = getActivityEntries();
+      const depositCount = activityEntries.filter((entry) => entry.category === 'deposit').length;
+      document.getElementById('profileDepositCount').textContent = `${depositCount}x`;
+
+      const redemptions = loadRedemptions();
+      const voucherCount = redemptions.filter((redemption) => redemption.category !== 'donasi').length;
+      const certificateCount = redemptions.filter((redemption) => redemption.category === 'donasi').length;
+      document.getElementById('profileVoucherCount').textContent = `${voucherCount} Aktif`;
+      document.getElementById('profileCertificateCount').textContent = `${certificateCount} Baru`;
+
+      document.getElementById('profileLevelTransition').textContent = level.nextName ? `Lvl ${level.level} → Lvl ${level.level + 1}` : `Lvl ${level.level} Maks`;
+      document.getElementById('profileRankMessage').innerHTML = level.nextName
+        ? `Tinggal <strong class="text-tertiary-fixed font-bold">${remaining} poin</strong> lagi menuju <strong class="text-secondary-fixed">${level.nextName}</strong>. Dapatkan sertifikat terakreditasi &amp; voucher apotek.`
+        : `Kamu sudah mencapai level tertinggi, <strong class="text-secondary-fixed">${level.name}</strong>! Terima kasih atas kontribusimu.`;
+      document.getElementById('profileRankCurrent').textContent = `${totalPoints} Poin`;
+      document.getElementById('profileRankTarget').textContent = `Target ${level.nextTarget.toLocaleString('id-ID')} Poin`;
+      document.getElementById('profileRankProgressBar').style.width = `${progressPercent}%`;
+
+      document.getElementById('profileDepositHistorySubtitle').textContent = `Daftar ${depositCount} setoran & verifikasi barcode digital`;
+      document.getElementById('profileExpiryReminderToggle').checked = Boolean(profile.expiryReminder);
+    };
+
+    let pendingAvatarDataUrl = '';
+
+    const openEditProfile = () => {
+      const profile = loadProfile();
+      pendingAvatarDataUrl = '';
+      document.getElementById('editProfileNameInput').value = profile.name;
+      document.getElementById('editProfileAvatarPreview').src = profile.avatarDataUrl || 'assets/profile-photo.jpg';
+      document.getElementById('editProfileError').hidden = true;
+      document.getElementById('editProfileModal').hidden = false;
+      document.body.style.overflow = 'hidden';
+    };
+
+    const closeEditProfile = () => {
+      document.getElementById('editProfileModal').hidden = true;
+      document.body.style.overflow = '';
+    };
+
+    document.getElementById('openEditProfile').addEventListener('click', openEditProfile);
+    document.getElementById('closeEditProfile').addEventListener('click', closeEditProfile);
+    document.getElementById('editProfileModal').addEventListener('click', (event) => {
+      if (event.target.id === 'editProfileModal') closeEditProfile();
+    });
+    document.getElementById('editProfileAvatarButton').addEventListener('click', () => {
+      document.getElementById('editProfileAvatarInput').click();
+    });
+    document.getElementById('editProfileAvatarInput').addEventListener('change', (event) => {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        pendingAvatarDataUrl = String(reader.result || '');
+        document.getElementById('editProfileAvatarPreview').src = pendingAvatarDataUrl;
+      };
+      reader.readAsDataURL(file);
+    });
+    document.getElementById('editProfileForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const name = document.getElementById('editProfileNameInput').value.trim();
+      const errorEl = document.getElementById('editProfileError');
+      if (!name) {
+        errorEl.textContent = 'Nama lengkap wajib diisi.';
+        errorEl.hidden = false;
+        return;
+      }
+      const profile = loadProfile();
+      profile.name = name;
+      if (pendingAvatarDataUrl) profile.avatarDataUrl = pendingAvatarDataUrl;
+      saveProfile(profile);
+      renderProfileUI();
+      closeEditProfile();
+    });
+
+    document.getElementById('profileExpiryReminderToggle').addEventListener('change', (event) => {
+      const profile = loadProfile();
+      profile.expiryReminder = event.target.checked;
+      saveProfile(profile);
+    });
+
+    document.getElementById('profileLogoutButton').addEventListener('click', () => {
+      const confirmed = window.confirm('Yakin ingin keluar dari akun Pharvia?');
+      if (confirmed) {
+        window.alert('Mode demo: logout belum terhubung ke sistem autentikasi sungguhan.');
+      }
     });
 
     const renderSavedDeposits = () => {
@@ -2505,20 +2941,26 @@ tailwind.config = {
       locationsScreen.hidden = page !== 'locations';
       rewardsScreen.hidden = page !== 'rewards';
       activityScreen.hidden = page !== 'activity';
+      profileScreen.hidden = page !== 'profile';
       updateSelectedDropoffNotice();
       document.querySelector('[data-path="beranda"]').setAttribute('aria-current', String(page === 'home'));
       document.querySelector('[data-path="setor"]').setAttribute('aria-current', String(page === 'deposit'));
       document.querySelector('[data-path="aktivitas"]').setAttribute('aria-current', String(page === 'activity'));
+      document.querySelector('[data-path="profil"]').setAttribute('aria-current', String(page === 'profile'));
       document.querySelector('[data-path="beranda"]').classList.toggle('text-primary', page === 'home');
       document.querySelector('[data-path="beranda"]').classList.toggle('font-bold', page === 'home');
       document.querySelector('[data-path="setor"]').classList.toggle('text-primary', page === 'deposit');
       document.querySelector('[data-path="setor"]').classList.toggle('font-bold', page === 'deposit');
       document.querySelector('[data-path="aktivitas"]').classList.toggle('text-primary', page === 'activity');
       document.querySelector('[data-path="aktivitas"]').classList.toggle('font-bold', page === 'activity');
+      document.querySelector('[data-path="profil"]').classList.toggle('text-primary', page === 'profile');
+      document.querySelector('[data-path="profil"]').classList.toggle('font-bold', page === 'profile');
       document.querySelector('[data-path="beranda"]').classList.toggle('text-on-surface-variant', page !== 'home');
       document.querySelector('[data-path="setor"]').classList.toggle('text-on-surface-variant', page !== 'deposit');
       document.querySelector('[data-path="aktivitas"]').classList.toggle('text-on-surface-variant', page !== 'activity');
+      document.querySelector('[data-path="profil"]').classList.toggle('text-on-surface-variant', page !== 'profile');
       if (page === 'activity') renderActivityUI();
+      if (page === 'profile') renderProfileUI();
       window.scrollTo({ top: 0, behavior: 'auto' });
     };
 
@@ -2528,6 +2970,7 @@ tailwind.config = {
       locationsScreen.hidden = true;
       rewardsScreen.hidden = true;
       activityScreen.hidden = true;
+      profileScreen.hidden = true;
       scannerScreen.hidden = false;
       document.body.style.overflow = 'hidden';
       setMode('barcode');
@@ -2546,6 +2989,7 @@ tailwind.config = {
       locationsScreen.hidden = activePage !== 'locations';
       rewardsScreen.hidden = activePage !== 'rewards';
       activityScreen.hidden = activePage !== 'activity';
+      profileScreen.hidden = activePage !== 'profile';
       document.body.style.overflow = '';
       document.querySelector('[data-path="scan"]').setAttribute('aria-current', 'false');
     };
@@ -2576,6 +3020,14 @@ tailwind.config = {
     });
     document.querySelectorAll('[data-open-activity]').forEach((control) => {
       control.addEventListener('click', () => setActivePage('activity'));
+    });
+    document.querySelector('[data-path="profil"]').addEventListener('click', (event) => {
+      event.preventDefault();
+      if (!scannerScreen.hidden) closeScanner();
+      setActivePage('profile');
+    });
+    document.querySelectorAll('[data-open-profile]').forEach((control) => {
+      control.addEventListener('click', () => setActivePage('profile'));
     });
     document.querySelectorAll('[data-open-deposit]').forEach((control) => {
       control.addEventListener('click', () => {
@@ -3031,11 +3483,16 @@ tailwind.config = {
         closeRedeemModal();
         return;
       }
+      if (event.key === 'Escape' && !document.getElementById('editProfileModal').hidden) {
+        closeEditProfile();
+        return;
+      }
       if (event.key === 'Escape' && !scannerScreen.hidden) {
         closeScanner();
       }
     });
     renderSavedDeposits();
+    renderProfileUI();
   })();
 </script>
 </body>
