@@ -1947,7 +1947,7 @@ tailwind.config = {
       details.append(name, meta, extra, expiry);
       const status = document.createElement('span');
       status.className = 'rounded-full bg-secondary-container/50 px-2 py-1 font-label-sm text-label-sm font-bold text-on-secondary-container';
-      status.textContent = deposit.isSample ? 'CONTOH' : 'Baru';
+      status.textContent = 'Baru';
       card.append(image, details, status);
       document.getElementById('scanDepositList').prepend(card);
     };
@@ -1986,8 +1986,8 @@ tailwind.config = {
       name.className = 'truncate font-headline-sm text-headline-sm font-bold text-primary';
       name.textContent = [deposit.name, deposit.strength].filter(Boolean).join(' ');
       const badge = document.createElement('span');
-      badge.className = `shrink-0 rounded-full px-2 py-1 font-label-sm text-label-sm font-bold ${deposit.isSample ? 'bg-primary-fixed text-on-primary-fixed-variant' : getDepositConditionClasses(deposit.condition)}`;
-      badge.textContent = deposit.isSample ? 'CONTOH' : deposit.condition || 'Aman Disimpan';
+      badge.className = `shrink-0 rounded-full px-2 py-1 font-label-sm text-label-sm font-bold ${getDepositConditionClasses(deposit.condition)}`;
+      badge.textContent = deposit.condition || 'Aman Disimpan';
       titleRow.append(name, badge);
       const quantity = document.createElement('p');
       quantity.className = 'mt-0.5 truncate font-body-sm text-body-sm text-on-surface-variant';
