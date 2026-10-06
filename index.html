@@ -611,6 +611,19 @@ tailwind.config = {
     </div>
   </div>
 
+  <button data-open-rewards type="button" class="mx-margin mt-3 flex items-center justify-between gap-3 rounded-2xl bg-surface-container-lowest p-3.5 shadow-sm active:scale-[0.98] transition-transform">
+    <div class="flex items-center gap-3 min-w-0">
+      <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-secondary-container/40 text-secondary">
+        <span class="material-symbols-outlined text-[22px]">redeem</span>
+      </div>
+      <div class="min-w-0 text-left">
+        <span class="block font-label-md text-label-md font-bold text-primary">Tukar Eco-Points</span>
+        <span class="block truncate font-body-sm text-body-sm text-on-surface-variant">Punya <span id="depositScreenPoints">130</span> poin — lihat katalog reward</span>
+      </div>
+    </div>
+    <span class="material-symbols-outlined shrink-0 text-secondary">chevron_right</span>
+  </button>
+
   <div id="depositItems" class="mx-margin mt-5 flex flex-col gap-3"></div>
   <p id="depositPageError" class="mx-margin mt-3 rounded-xl bg-error-container p-3 font-body-sm text-body-sm text-on-error-container" role="alert" hidden></p>
   <p id="depositEmptyState" class="mx-margin mt-5 rounded-2xl bg-surface-container-low p-5 text-center font-body-md text-body-md text-on-surface-variant" hidden>Belum ada obat di daftar setoran. Tambahkan dengan scan atau isi manual.</p>
@@ -710,11 +723,6 @@ tailwind.config = {
     </div>
     <h1 class="font-headline-lg-mobile text-headline-lg-mobile font-extrabold tracking-tight text-primary">Pharvia Eco-Points</h1>
     <p class="mt-0.5 font-body-md text-body-md text-on-surface-variant">Tukarkan poin kontribusi kelola obat sisa dengan reward ramah lingkungan &amp; kesehatan.</p>
-  </div>
-
-  <div id="rewardToast" class="mx-margin mt-1 hidden items-center gap-2.5 rounded-xl p-3 font-body-sm text-body-sm shadow-sm" role="status" aria-live="polite">
-    <span id="rewardToastIcon" class="material-symbols-outlined text-[20px]"></span>
-    <span id="rewardToastMessage" class="min-w-0 flex-1"></span>
   </div>
 
   <div class="px-margin pt-space-sm">
@@ -1003,6 +1011,25 @@ tailwind.config = {
       <span class="font-label-md text-label-md font-bold">Green Poin</span>
     </div>
     <p class="mt-4 font-body-sm text-body-sm text-on-surface-variant">Membuka daftar setor...</p>
+  </div>
+</div>
+
+<div id="redeemResultModal" class="success-backdrop fixed inset-0 z-[100] flex items-center justify-center bg-primary/55 p-6 backdrop-blur-md" role="alertdialog" aria-live="assertive" aria-label="Status penukaran reward" hidden>
+  <div class="success-card relative w-full max-w-[340px] overflow-hidden rounded-[28px] border border-white/70 bg-white p-7 text-center shadow-[0_24px_80px_rgba(0,35,70,0.32)]">
+    <span id="redeemModalSparkle1" class="success-sparkle absolute left-9 top-12 material-symbols-outlined text-[24px] text-secondary">auto_awesome</span>
+    <span id="redeemModalSparkle2" class="success-sparkle absolute right-10 top-8 material-symbols-outlined text-[20px] text-primary-fixed-dim" style="animation-delay:180ms">star</span>
+    <span id="redeemModalSparkle3" class="success-sparkle absolute bottom-16 right-8 material-symbols-outlined text-[18px] text-tertiary-container" style="animation-delay:320ms">eco</span>
+    <div id="redeemModalIconWrap" class="success-coin mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-secondary-container to-tertiary-fixed text-on-secondary-container shadow-[0_10px_24px_rgba(0,106,97,0.28)]">
+      <span id="redeemModalIcon" class="material-symbols-outlined text-[42px]">check_circle</span>
+    </div>
+    <h2 id="redeemModalTitle" class="mt-5 font-headline-sm text-headline-sm font-extrabold text-primary">Berhasil ditukar!</h2>
+    <p id="redeemModalName" class="mt-1 truncate font-body-md text-body-md text-on-surface-variant"></p>
+    <div id="redeemModalPointsWrap" class="success-coin mt-5 inline-flex items-center gap-2 rounded-full bg-secondary-container px-5 py-3 text-on-secondary-container shadow-sm">
+      <span id="redeemModalPointsIcon" class="material-symbols-outlined">stars</span>
+      <strong id="redeemModalPoints" class="font-headline-sm text-headline-sm"></strong>
+    </div>
+    <p id="redeemModalMessage" class="mt-4 font-body-sm text-body-sm text-on-surface-variant"></p>
+    <button id="closeRedeemModal" type="button" class="mt-5 h-12 w-full rounded-full bg-primary font-label-lg text-label-lg font-bold text-white active:scale-95 transition-transform">Oke, Mengerti</button>
   </div>
 </div>
 
@@ -1622,25 +1649,48 @@ tailwind.config = {
       return { label: 'Level 1: Eco Starter', nextTarget: 400 };
     };
 
-    const showRewardToast = (message, variant = 'success') => {
-      const toast = document.getElementById('rewardToast');
-      const icon = document.getElementById('rewardToastIcon');
-      const text = document.getElementById('rewardToastMessage');
-      if (!toast) return;
-      toast.classList.remove('hidden');
-      toast.classList.add('flex');
-      toast.classList.toggle('bg-secondary-container/40', variant === 'success');
-      toast.classList.toggle('text-on-secondary-container', variant === 'success');
-      toast.classList.toggle('bg-error-container', variant === 'error');
-      toast.classList.toggle('text-on-error-container', variant === 'error');
-      icon.textContent = variant === 'success' ? 'check_circle' : 'error';
-      text.textContent = message;
-      window.clearTimeout(showRewardToast.timer);
-      showRewardToast.timer = window.setTimeout(() => {
-        toast.classList.add('hidden');
-        toast.classList.remove('flex');
-      }, 3200);
+    const closeRedeemModal = () => {
+      const modal = document.getElementById('redeemResultModal');
+      if (!modal || modal.hidden) return;
+      modal.hidden = true;
+      document.body.style.overflow = '';
     };
+
+    const showRedeemModal = ({ variant, name, pointsLabel, message }) => {
+      const modal = document.getElementById('redeemResultModal');
+      if (!modal) return;
+      const isSuccess = variant === 'success';
+      const iconWrap = document.getElementById('redeemModalIconWrap');
+      const icon = document.getElementById('redeemModalIcon');
+      const title = document.getElementById('redeemModalTitle');
+      const nameEl = document.getElementById('redeemModalName');
+      const pointsWrap = document.getElementById('redeemModalPointsWrap');
+      const pointsIcon = document.getElementById('redeemModalPointsIcon');
+      const points = document.getElementById('redeemModalPoints');
+      const messageEl = document.getElementById('redeemModalMessage');
+      ['redeemModalSparkle1', 'redeemModalSparkle2', 'redeemModalSparkle3'].forEach((id) => {
+        const sparkle = document.getElementById(id);
+        if (sparkle) sparkle.style.display = isSuccess ? '' : 'none';
+      });
+
+      iconWrap.className = `success-coin mx-auto flex h-20 w-20 items-center justify-center rounded-full shadow-[0_10px_24px_rgba(0,106,97,0.28)] ${isSuccess ? 'bg-gradient-to-br from-secondary-container to-tertiary-fixed text-on-secondary-container' : 'bg-error-container text-on-error-container'}`;
+      icon.textContent = isSuccess ? 'check_circle' : 'error';
+      title.textContent = isSuccess ? 'Berhasil ditukar!' : 'Poin Belum Cukup';
+      title.className = `mt-5 font-headline-sm text-headline-sm font-extrabold ${isSuccess ? 'text-primary' : 'text-error'}`;
+      nameEl.textContent = name;
+      pointsWrap.className = `success-coin mt-5 inline-flex items-center gap-2 rounded-full px-5 py-3 shadow-sm ${isSuccess ? 'bg-secondary-container text-on-secondary-container' : 'bg-error-container text-on-error-container'}`;
+      pointsIcon.textContent = isSuccess ? 'stars' : 'lock_clock';
+      points.textContent = pointsLabel;
+      messageEl.textContent = message;
+
+      modal.hidden = false;
+      document.body.style.overflow = 'hidden';
+    };
+
+    document.getElementById('closeRedeemModal').addEventListener('click', closeRedeemModal);
+    document.getElementById('redeemResultModal').addEventListener('click', (event) => {
+      if (event.target.id === 'redeemResultModal') closeRedeemModal();
+    });
 
     const renderRewardsHistory = () => {
       const list = document.getElementById('rewardsHistoryList');
@@ -1676,7 +1726,7 @@ tailwind.config = {
       const remaining = Math.max(0, level.nextTarget - totalPoints);
       const progressPercent = Math.min(100, Math.round((totalPoints / level.nextTarget) * 100));
 
-      document.querySelectorAll('#homePointsStat, #homeRewardPoints, #rewardsPointsBalance').forEach((el) => {
+      document.querySelectorAll('#homePointsStat, #homeRewardPoints, #rewardsPointsBalance, #depositScreenPoints').forEach((el) => {
         if (el) el.textContent = totalPoints;
       });
       const levelBadge = document.getElementById('rewardsLevelBadge');
@@ -1706,7 +1756,12 @@ tailwind.config = {
       const icon = button.dataset.rewardIcon || 'redeem';
       const totalPoints = getTotalPoints();
       if (totalPoints < cost) {
-        showRewardToast(`Poin kamu belum cukup. Kurang ${cost - totalPoints} Poin lagi untuk menukar "${name}".`, 'error');
+        showRedeemModal({
+          variant: 'error',
+          name,
+          pointsLabel: `Kurang ${cost - totalPoints} Poin`,
+          message: `Saldo kamu saat ini ${totalPoints} Poin. Setor lebih banyak obat untuk mengumpulkan poin tambahan.`
+        });
         return;
       }
       const redemptions = loadRedemptions();
@@ -1719,8 +1774,13 @@ tailwind.config = {
         date: new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date())
       });
       localStorage.setItem(redemptionsStorageKey, JSON.stringify(redemptions));
-      showRewardToast(`Berhasil menukar "${name}" dengan ${cost} Poin!`, 'success');
       renderPointsUI();
+      showRedeemModal({
+        variant: 'success',
+        name,
+        pointsLabel: `-${cost} Poin`,
+        message: `Sisa saldo kamu sekarang ${getTotalPoints()} Poin.`
+      });
     };
 
     document.getElementById('rewardsScreen').addEventListener('click', (event) => {
@@ -2619,6 +2679,10 @@ tailwind.config = {
       }
       if (event.key === 'Escape' && !document.getElementById('depositEditModal').hidden) {
         closeDepositEditor();
+        return;
+      }
+      if (event.key === 'Escape' && !document.getElementById('redeemResultModal').hidden) {
+        closeRedeemModal();
         return;
       }
       if (event.key === 'Escape' && !scannerScreen.hidden) {
